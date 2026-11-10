@@ -1,0 +1,1002 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex,nofollow">
+<title>Phase3 platform · target architecture</title>
+<style>
+:root{--Measure:#1f6fb8;--Measurebg:#e3eefa;--Manage:#1f8a4c;--Managebg:#e6f4ec;--Reason:#6455e0;--Reasonbg:#ecebfc;--Clients:#a0522d;--Clientsbg:#f8ece4;--Foundation:#5f6b7a;--Foundationbg:#eceef1;--bg:#f5f4f0;--panel:#fff;--panel2:#f8f7f3;--line:#e2e0d8;--line2:#cfccc2;--text:#1d1e22;--text2:#4b4a52;--muted:#7a7982;--accent:#6455e0;
+--impl:#1f8a4c;--part:#b07d00;--plan:#8a8994;--sim:#1f6fb8;--implbg:#e6f4ec;--partbg:#fcf3dc;--planbg:#efeef2;--simbg:#e3eefa;color-scheme:light}
+[data-theme=dark]{--Measure:#7cb8f2;--Measurebg:#1c2c3d;--Manage:#6fcf97;--Managebg:#1f3328;--Reason:#b6acf2;--Reasonbg:#2a2745;--Clients:#e8a77f;--Clientsbg:#3a2a20;--Foundation:#a9b4c2;--Foundationbg:#2a2e34;--bg:#17181c;--panel:#202126;--panel2:#26272d;--line:#33343b;--line2:#45464e;--text:#ecebe8;--text2:#b8b7b2;--muted:#8d8c95;--accent:#b6acf2;
+--impl:#6fcf97;--part:#f2c94c;--plan:#9a99a3;--sim:#7cb8f2;--implbg:#1f3328;--partbg:#3a321a;--planbg:#2b2b31;--simbg:#1c2c3d;color-scheme:dark}
+*{box-sizing:border-box}html,body{margin:0}
+body{background:var(--bg);color:var(--text);font:14px/1.5 "Segoe UI",system-ui,-apple-system,Roboto,Helvetica,Arial,sans-serif}
+header{position:sticky;top:0;z-index:10;background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(6px);border-bottom:1px solid var(--line);display:flex;align-items:center;gap:16px;padding:10px 22px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:10px}.brand b{font-size:17px}.brand small{display:block;color:var(--muted);font-size:10.5px;letter-spacing:.13em}
+nav.tabs{display:flex;gap:4px;flex-wrap:wrap}
+nav.tabs button{all:unset;cursor:pointer;padding:6px 12px;border-radius:8px;color:var(--text2);font-size:13.5px;font-weight:550}
+nav.tabs button:hover{background:var(--panel2)}nav.tabs button.on{background:var(--text);color:var(--bg)}
+.sp{flex:1}
+.btn{all:unset;cursor:pointer;display:inline-flex;align-items:center;gap:6px;padding:6px 11px;border-radius:8px;border:1px solid var(--line2);background:var(--panel);font-size:13px;font-weight:550;color:var(--text)}
+.btn:hover{border-color:var(--accent)}.btn.pri{background:var(--accent);border-color:var(--accent);color:#fff}[data-theme=dark] .btn.pri{color:#17171b}
+.btn.on{background:var(--text);color:var(--bg);border-color:var(--text)}
+.btn:disabled{opacity:.45;cursor:default}
+main{padding:16px 22px 120px;max-width:1560px;margin:0 auto}
+.lede{color:var(--text2);max-width:980px;margin:2px 0 14px;font-size:14.5px}
+.note{font-size:12px;color:var(--muted)}
+.st{display:inline-block;font-size:10.5px;font-weight:650;padding:1px 7px;border-radius:999px;white-space:nowrap;border:1px solid currentColor}
+.st.L{border:1px solid currentColor}.st.Implemented{color:var(--impl);background:var(--implbg)}.st.Partial{color:var(--part);background:var(--partbg)}.st.Planned{color:var(--plan);background:var(--planbg);border-style:dashed}.st.Simulated-demo{color:var(--sim);background:var(--simbg)}
+.legend{display:flex;gap:10px;flex-wrap:wrap;align-items:center;font-size:12px;color:var(--text2)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px 16px;min-width:0}
+.card h3{margin:0 0 8px;font-size:14.5px;display:flex;gap:8px;align-items:center}
+.grid{display:grid;gap:14px}
+.mapwrap{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:14px;align-items:start}
+.toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:10px}
+select{background:var(--panel);color:var(--text);border:1px solid var(--line2);border-radius:8px;padding:6px 8px;font:inherit;font-size:13px}
+input[type=text]{background:var(--panel);color:var(--text);border:1px solid var(--line2);border-radius:8px;padding:6px 9px;font:inherit;font-size:13px}
+svg#map{width:100%;height:auto;display:block;background:var(--panel);border:1px solid var(--line);border-radius:14px}
+svg text{font-family:inherit}
+.zone{fill:var(--panel2)}.zt{fill:var(--muted);font-size:10.5px;letter-spacing:.1em;font-weight:650}
+.node rect{stroke-width:1.4;rx:9;cursor:pointer;transition:opacity .25s}
+.node .nn{font-size:12px;font-weight:650;fill:var(--text);pointer-events:none}.node .ns{font-size:10px;fill:var(--muted);pointer-events:none}
+.node.dim{opacity:.22}.node.hot rect{stroke-width:2.6;filter:drop-shadow(0 2px 6px rgba(100,85,224,.35))}.node.sel rect{stroke:var(--accent)!important;stroke-width:2.8}
+.edge{fill:none;stroke:var(--line2);stroke-width:1.1;opacity:.55;transition:opacity .25s}
+.edge.on{stroke-width:2.6;opacity:1}.edge.dim{opacity:.08}.edge.planned{stroke-dasharray:6 5}
+.tlabel{font-size:9.5px;font-weight:600}
+.tbadge{rx:5}
+.panel{position:sticky;top:70px;max-height:calc(100vh - 90px);overflow:auto}
+.hop{display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--line);cursor:pointer}
+.hop .n{width:22px;height:22px;flex:none;border-radius:50%;display:grid;place-items:center;font-size:11px;font-weight:700;background:var(--panel2);color:var(--text2);border:1px solid var(--line2)}
+.hop.cur .n{background:var(--accent);color:#fff;border-color:var(--accent)}.hop.done .n{background:var(--text);color:var(--bg);border-color:var(--text)}
+.hop b{font-size:13px}.hop .d{font-size:12.5px;color:var(--text2)}.hop .bd{font-size:11.8px;color:var(--part);margin-top:2px}
+.hop:not(.cur):not(.done) .d,.hop:not(.cur):not(.done) .bd{display:none}
+.kv{display:grid;grid-template-columns:96px 1fr;gap:4px 10px;font-size:13px}.kv div:nth-child(odd){color:var(--muted)}
+.bound{border-left:3px solid var(--part);background:var(--partbg);padding:8px 11px;border-radius:0 9px 9px 0;font-size:12.8px;margin-top:10px}
+.okb{border-left:3px solid var(--impl);background:var(--implbg);padding:8px 11px;border-radius:0 9px 9px 0;font-size:12.8px;margin-top:10px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;font-size:11.5px;color:var(--muted);font-weight:600;padding:7px 8px;border-bottom:1px solid var(--line2);white-space:nowrap}
+td{padding:7px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+.bars{display:flex;height:16px;border-radius:999px;overflow:hidden;border:1px solid var(--line)}
+.bars span{display:block;height:100%}
+.states{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:6px 0}
+.state{padding:5px 11px;border-radius:999px;border:1px solid var(--line2);background:var(--panel2);font-size:12.5px;font-weight:600}
+.arr{color:var(--muted)}
+.funnel div{margin:4px 0;padding:7px 12px;border-radius:9px;background:var(--panel2);border:1px solid var(--line);font-size:13px}
+.scen{cursor:pointer}.scen.on{outline:2px solid var(--accent)}
+.tour{position:fixed;left:16px;right:16px;bottom:14px;z-index:30;background:var(--panel);border:1px solid var(--line2);border-radius:14px;box-shadow:0 10px 40px rgba(0,0,0,.18);display:none}
+.tour .pg{height:3px;background:var(--line);border-radius:14px 14px 0 0;overflow:hidden}.tour .pg span{display:block;height:100%;width:0;background:var(--accent);transition:width .3s}
+.tour .row{display:flex;gap:14px;align-items:flex-start;padding:11px 16px}
+.tour .tx{flex:1;min-width:0}.tour .tn{font-size:11px;letter-spacing:.1em;color:var(--muted);text-transform:uppercase}.tour .tt{font-weight:650;font-size:15px}.tour .tb{font-size:13px;color:var(--text2)}
+@media (max-width:1100px){.mapwrap{grid-template-columns:1fr}.panel{position:static;max-height:none}}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand"><svg width="26" height="26" viewBox="0 0 32 32" aria-hidden="true"><g fill="var(--accent)"><rect x="6" y="6" width="4" height="13"/><rect x="14" y="10" width="4" height="13"/><rect x="22" y="14" width="4" height="13"/></g></svg>
+    <div><b>Phase3 platform</b><small>TARGET ARCHITECTURE</small></div></div>
+  <nav class="tabs" id="tabs"></nav>
+  <span class="sp"></span>
+  <button class="btn pri" id="tourBtn">▶ Guided tour</button>
+  <button class="btn" id="themeBtn" title="Light or dark">◐</button>
+</header>
+<main id="main"></main>
+<div class="tour" id="tour"><div class="pg"><span></span></div><div class="row"><div class="tx"><div class="tn" id="tN"></div><div class="tt" id="tT"></div><div class="tb" id="tB"></div></div>
+<div class="row" style="padding:0;gap:6px;align-items:center"><select id="vSel" style="max-width:150px"></select><button class="btn" id="tV">🔊</button><button class="btn" id="tP">←</button><button class="btn pri" id="tPl">❚❚</button><button class="btn" id="tN2">→</button><button class="btn" id="tX">✕</button></div></div></div>
+
+<script>
+/* Phase3 platform: target architecture (North Star). Components described as the complete system. */
+window.ARCH = {
+COLS: [
+  { t: 'Things', sub: 'devices & data sources', x: 16 },
+  { t: 'Cloud gateway', sub: 'identity · ingest · command', x: 222 },
+  { t: 'Stream & batch processing', sub: 'event-driven workers', x: 428 },
+  { t: 'Storage', sub: 'hot · warm · cold · graph', x: 664 },
+  { t: 'Platform services', sub: 'APIs · Reason · Capacity', x: 880 },
+  { t: 'Clients & delivery', sub: 'consumers of the platform', x: 1096 },
+],
+LAYERS: {
+  Measure: 'Field truth: devices, gateway, device identity',
+  Manage: 'The system of record: ingestion, processing, storage, workflow',
+  Reason: 'Operational reasoning the DSO owns',
+  Clients: 'Everything that consumes the platform',
+  Foundation: 'Identity, keys and monitoring under everything',
+},
+NODES: [
+  // Things
+  { id: 'gm', c: 0, r: 0.35, n: 'Ground-mounted monitor', s: 'multi-feeder · per-phase', layer: 'Measure',
+    p: 'Monitors every LV way at a ground-mounted substation: per-phase voltage, current, power, PF, harmonics, energy and earth leakage, with events.',
+    io: 'Telemetry, events and CSRs → IoT Hub · configuration and commands ← device twin', b: 'Secure-element identity, signed firmware, bare-metal thresholds and triggers, last-gasp on loss of mains, and a device twin, the same contract across the family.' },
+  { id: 'pm', c: 0, r: 1.3, n: 'Pole-mounted monitor', s: 'pole transformers · tilt', layer: 'Measure',
+    p: 'Monitors pole-mounted transformers on the rural network, including pole tilt and temperature.',
+    io: 'Telemetry and events → IoT Hub · configuration ← twin', b: 'Secure-element identity, signed firmware, bare-metal thresholds and triggers, last-gasp on loss of mains, and a device twin, the same contract across the family.' },
+  { id: 'efi', c: 0, r: 2.25, n: 'Directional fault indicator', s: 'EFI · fault passage & direction', layer: 'Measure',
+    p: 'Detects fault current passing and its direction, so a fault can be located between indicators and the healthy sections restored sooner.',
+    io: 'Fault-passage events → IoT Hub · settings ← twin', b: 'Secure-element identity, signed firmware, bare-metal thresholds and triggers, last-gasp on loss of mains, and a device twin, the same contract across the family.' },
+  { id: 'vo', c: 0, r: 3.2, n: 'Single-feeder monitor', s: 'or voltage-only · low cost', layer: 'Measure',
+    p: 'A lighter monitor for one feeder or voltage only, to widen visibility across the LV network at lower cost.',
+    io: 'Telemetry and events → IoT Hub · configuration ← twin', b: 'Secure-element identity, signed firmware, bare-metal thresholds and triggers, last-gasp on loss of mains, and a device twin, the same contract across the family.' },
+  { id: 'cert', c: 0, r: 4.45, n: 'Certified partner devices', s: 'other manufacturers', layer: 'Measure',
+    p: 'Other companies\' devices that pass Phase3 certification (identity, payload contract, security and firmware practice) connect directly through DPS and IoT Hub, exactly like ours.',
+    io: 'Attested enrolment → same telemetry, event and twin contract',
+    b: 'DSOs aren\'t locked into one hardware vendor, and every certified device lands in the same record and Reason pipeline.' },
+  { id: 'mon', c: 0, r: 5.6, n: 'Third-party head-ends', s: 'other vendors\' platforms', layer: 'Manage',
+    p: 'Existing LV monitoring fleets from other vendors, read from their head-end platforms and ingested into the time-series store through adapters.', io: 'Vendor APIs → ingestion adapters → ADX',
+    b: 'The platform stands alone: it doesn\'t need Phase3 hardware to be useful.' },
+  { id: 'dsoapi', c: 0, r: 6.75, n: 'DSO open-data APIs', s: 'sites · outages · faults · meters', layer: 'Manage',
+    p: 'Published DSO data: substations, planned and unplanned outages, live faults, smart-meter aggregates, standard profiles.', io: 'REST / file APIs → ingestion adapters' },
+  { id: 'hist', c: 0, r: 7.85, n: 'Utility historians', s: 'time-series archives', layer: 'Manage',
+    p: 'SCADA and plant historians (for example PI-style archives) read in time windows.', io: 'Windowed queries → ingestion adapters' },
+  { id: 'files', c: 0, r: 8.95, n: 'Files & Blob drops', s: 'CSV · JSON · Parquet', layer: 'Manage',
+    p: 'Bulk files dropped by the DSO or partners into a landing container: readings, context, customer and asset registers.', io: 'Blob landing zone → event → adapters' },
+  { id: 'cim', c: 0, r: 10.05, n: 'CIM network models', s: 'CGMES · CDPSM · 61968', layer: 'Manage',
+    p: 'The DSO\'s network model and asset data exchanged as CIM: substations, feeders, transformers, connectivity, mRIDs.', io: 'CIM XML / RDF → CIM adapter',
+    b: 'Standards-based import means the asset record speaks the DSO\'s own identifiers from day one.' },
+  // Cloud gateway
+  { id: 'dps', c: 1, r: 0, n: 'Device Provisioning', s: 'attested enrolment', layer: 'Measure',
+    p: 'Zero-touch onboarding: devices prove their factory identity and are assigned to the right hub and tenant.', io: 'Factory identity → hub assignment → initial twin' },
+  { id: 'iothub', c: 1, r: 1.3, n: 'Azure IoT Hub', s: 'identities · twins · commands', layer: 'Measure',
+    p: 'Per-device identity, twins (desired/reported), direct methods, OTA orchestration and event routing.', io: 'Device traffic ↔ hub · events → Event Hubs' },
+  { id: 'eh', c: 1, r: 2.8, n: 'Event Hubs', s: 'event backbone', layer: 'Measure',
+    p: 'Partitioned, replayable event stream for telemetry, alarms and certificate requests.', io: 'Hub routes → processing consumers' },
+  { id: 'land', c: 1, r: 5.7, n: 'Landing zone · Event Grid', s: 'files & pulls in', layer: 'Manage',
+    p: 'Secure entry for external data: scheduled pulls from APIs and historians, and Blob drops that raise events.', io: 'External sources → raw landing → ingestion jobs' },
+  // Processing
+  { id: 'fprov', c: 2, r: 0, n: 'Provisioning handler', s: 'onboarding', layer: 'Measure', p: 'Binds a newly provisioned device to its tenant, site and initial configuration.', io: 'DPS callback → device record → initial twin' },
+  { id: 'ftel', c: 2, r: 1, n: 'Telemetry processor', s: 'parse · normalise · branch', layer: 'Manage', p: 'Validates and normalises device batches; branches into time series, latest state, traffic and alarms.', io: 'Event Hubs → ADX · state queue · alert queue' },
+  { id: 'ffeed', c: 2, r: 2, n: 'State persistence', s: 'latest values', layer: 'Manage', p: 'Maintains the latest per-phase state on each asset record.', io: 'State queue → asset record' },
+  { id: 'falert', c: 2, r: 3, n: 'Alarm & notification engine', s: 'alarms · incidents · routing', layer: 'Manage',
+    p: 'Alarm lifecycle, incident grouping, rule-based routing by role, site and severity, duty rosters, quiet-hours queuing and escalation with acknowledgement timeouts.',
+    io: 'Alert queue → alarms/incidents → email, SMS, Teams, push, webhooks → delivery and acknowledgement records' },
+  { id: 'fcsr', c: 2, r: 4, n: 'Certificate lifecycle', s: 'issue · renew · revoke', layer: 'Measure', p: 'Handles CSRs, schedules renewal before expiry and publishes revocation.', io: 'CSR events → CA → device · revocation list' },
+  { id: 'fconn', c: 2, r: 5, n: 'Fleet health', s: 'heartbeat · comms · SIM', layer: 'Measure', p: 'Connectivity, heartbeat, mains state, SIM usage and certificate/firmware posture for every device.', io: 'IoT and carrier data → fleet health records' },
+  { id: 'fana', c: 2, r: 6, n: 'Built-in analytics', s: 'PQ · loading · compliance', layer: 'Manage', p: 'Statutory voltage, harmonics and imbalance checks, loading and stress, daily behaviour and data-quality evaluation.', io: 'ADX + context + thresholds → cases, watchlists, insights' },
+  { id: 'fing', c: 2, r: 7, n: 'Ingestion adapters', s: 'API · historian · file', layer: 'Manage', p: 'Source adapters transform any feed into canonical observations with full lineage; chunked, replayable and idempotent.', io: 'Landing zone → canonical chunks → ADX + lineage' },
+  { id: 'fcim', c: 2, r: 8, n: 'CIM adapter', s: 'import · validate · export', layer: 'Manage', p: 'Imports CIM models into the asset record and network graph, validates them against the agreed profile, and exports findings and limits as CIM messages.', io: 'CIM in → record + graph · findings → CIM out' },
+  { id: 'fsched', c: 2, r: 9, n: 'Reason scheduler', s: 'governed evaluations', layer: 'Reason', p: 'Runs approved methods on schedule or on event, each at an explicit evaluation time.', io: 'Schedule/event → Reason runtime' },
+  { id: 'frep', c: 2, r: 10, n: 'Report engine', s: 'scheduled · on demand', layer: 'Manage', p: 'Builds operational and statutory reports as HTML, PDF and Excel; archives each issued report.', io: 'Schedules → content → email + immutable archive' },
+  // Storage
+  { id: 'q', c: 3, r: 1.5, n: 'Queues', s: 'work · retries · dead-letter', layer: 'Manage', p: 'Decouples every step with retries and dead-letter handling.', io: 'Producers → queue → workers' },
+  { id: 'blob', c: 3, r: 3, n: 'Cold store & archive', s: 'Blob · immutable', layer: 'Manage', p: 'Raw source files, firmware images, issued reports and audit, under immutable retention policies.', io: 'Raw/archive writes → policy-governed retention' },
+  { id: 'adx', c: 3, r: 4.6, n: 'Time-series store', s: 'Azure Data Explorer', layer: 'Manage', p: 'Warm path for every measurement and canonical observation, with hot cache and long-term retention.', io: 'Ingestion → KQL' },
+  { id: 'sql', c: 3, r: 6.2, n: 'Asset record', s: 'Azure SQL · system of record', layer: 'Manage', p: 'The CRM of the grid: one record per asset with identity (mRID), context, alarms, findings, cases, work, decisions and audit.', io: 'Services ↔ record' },
+  { id: 'adt', c: 3, r: 7.8, n: 'Network graph', s: 'connectivity model', layer: 'Manage', p: 'Primary → feeder → transformer → customer connectivity from the CIM model, kept in step with the record.', io: 'CIM adapter → graph → Reason and Capacity' },
+  // Services
+  { id: 'devapi', c: 4, r: 0.4, n: 'Device service', s: 'fleet · twin · OTA', layer: 'Measure', p: 'Fleet inventory, configuration, commands and staged firmware rollouts.', io: 'Clients → IoT Hub operations' },
+  { id: 'vault', c: 4, r: 1.7, n: 'Certificate authority', s: 'HSM-backed', layer: 'Measure', p: 'Issues device certificates only to entitled callers; signs inside the HSM.', io: 'CSR → certificate · revocation' },
+  { id: 'adxapi', c: 4, r: 3.0, n: 'Telemetry service', s: 'time-series queries', layer: 'Manage', p: 'Scoped queries and aggregates over any measurement.', io: 'Clients → KQL → JSON' },
+  { id: 'sqlapi', c: 4, r: 4.3, n: 'Record & workflow service', s: 'assets · cases · work', layer: 'Manage', p: 'The asset record, alarms, incidents, cases, work, handover, notifications, reports and configuration.', io: 'Clients → record operations' },
+  { id: 'intapi', c: 4, r: 5.6, n: 'Reason runtime', s: 'CKM · IRL · governed', layer: 'Reason', p: 'Compiles the DSO\'s methods in IRL against the CKM, runs detection families on evidence at an explicit time, and records explained findings with lineage. Replayable on any day.', io: 'Methods + evidence → findings → assessments → recommendations' },
+  { id: 'capapi', c: 4, r: 6.9, n: 'Capacity service', s: 'headroom · connections · flex', layer: 'Reason', p: 'Headroom from measured and estimated load, connection checks, flexible-connection limits and flexibility verification, on the network graph.', io: 'Findings + graph → assessments → CIM limits' },
+  { id: 'apim', c: 4, r: 8.3, n: 'API gateway', s: 'APIM · partner access', layer: 'Clients', p: 'Published, versioned APIs and webhooks for DSO systems and partners, with quotas and keys.', io: 'Partners ↔ platform services' },
+  { id: 'ops', c: 4, r: 9.6, n: 'Platform operations', s: 'estate · cost · SLOs', layer: 'Foundation', p: 'Service health, quotas, cost and SLOs across tenants.', io: 'Azure estate → operations view' },
+  // Clients
+  { id: 'user', c: 5, r: 0, n: 'Operators & engineers', s: 'control, planning, assets', layer: 'Clients', p: 'People in the DSO who act on the record.', io: 'Sign-in, views, decisions' },
+  { id: 'spa', c: 5, r: 1.35, n: 'Operator portal (web)', s: 'dashboard · map · command', layer: 'Clients', p: 'One client of the platform: everything it shows comes from the platform services.', io: 'User → platform APIs' },
+  { id: 'portal', c: 5, r: 2.5, n: 'Portal backend · SignalR', s: 'backend-for-frontend', layer: 'Clients', p: 'The portal\'s own backend: composes platform calls and pushes live updates.', io: 'Portal ↔ platform services' },
+  { id: 'apicl', c: 5, r: 3.9, n: 'DSO & partner apps', s: 'via API gateway', layer: 'Clients', p: 'DSO tools, aggregators and partners using the same APIs and webhooks.', io: 'API gateway ↔ apps' },
+  { id: 'smtp', c: 5, r: 5.1, n: 'Email', s: 'alerts · reports', layer: 'Clients', p: 'Alerts, actions and scheduled reports.', io: 'Engine → mail → people' },
+  { id: 'sms', c: 5, r: 6.1, n: 'SMS', s: 'urgent alerts', layer: 'Clients', p: 'Urgent alerts to on-duty staff.', io: 'Engine → SMS → people' },
+  { id: 'teams', c: 5, r: 7.1, n: 'Teams · push · webhooks', s: 'collaboration', layer: 'Clients', p: 'Alerts into the tools teams already use, with acknowledgement.', io: 'Engine → channels → acknowledgement' },
+  { id: 'dsosys', c: 5, r: 8.4, n: 'DSO systems', s: 'EAM · OMS · ADMS · GIS', layer: 'Clients', p: 'Findings, limits and cases flow into the DSO\'s own systems as CIM messages and work orders, with acknowledgements back.', io: 'CIM / API ↔ DSO systems' },
+  // Foundation band
+  { id: 'appi', c: 2, r: 11.45, n: 'Monitoring & SIEM', s: 'App Insights · Sentinel', layer: 'Foundation', p: 'Logs, traces, metrics and security events with alerting and on-call.', io: 'Every component → monitoring' },
+  { id: 'kv', c: 3, r: 11.45, n: 'Key Vault · managed HSM', s: 'keys · secrets · CA', layer: 'Foundation', p: 'Keys, secrets and the CA key in hardware; rotation by policy.', io: 'Services → keys (never exported)' },
+  { id: 'entra', c: 5, r: 11.45, n: 'Microsoft Entra ID', s: 'MFA · conditional access', layer: 'Foundation', p: 'Single sign-on, MFA, conditional access, roles and managed identities.', io: 'People and services → tokens' },
+],
+FLOWS: [
+ { id: 'a', t: 'Telemetry reading', c: '#2a9d8f', intro: 'One measurement, from the substation to an engineer\'s screen.',
+   hops: [
+    ['gm', 'iothub', 'Device → IoT Hub', 'Signed, timestamped batch over mutual TLS with the device\'s X.509 identity; buffered on the device if the link drops.'],
+    ['iothub', 'eh', 'Hub → event backbone', 'Routed to a partitioned, replayable Event Hub.'],
+    ['eh', 'ftel', 'Telemetry processor', 'Validated, decompressed and normalised; quality flags set; branches to time series, latest state and alarms.'],
+    ['ftel', 'adx', 'Time series', 'Every reading lands in the time-series store with source, unit and quality.'],
+    ['ftel', 'q', 'Latest state', 'Latest per-phase state queued for the asset record.'],
+    ['q', 'ffeed', 'State persistence', 'Identity and binding checked against the record.'],
+    ['ffeed', 'sql', 'Asset record', 'The transformer\'s record shows its latest state, with the evidence time.'],
+    ['adx', 'adxapi', 'Telemetry service', 'Scoped queries and aggregates.'],
+    ['adxapi', 'portal', 'To the client', 'Joined with asset context.'],
+    ['portal', 'spa', 'On screen', 'A live update refreshes the view with the reading and its timestamp.'],
+   ] },
+ { id: 'b', t: 'Alarm event (any algorithm)', c: '#e76f51', intro: 'Any event algorithm, on the device or in the platform, raises an alarm that follows the same path to an incident and a live update.',
+   hops: [
+    ['efi', 'iothub', 'Device event', 'Any on-device algorithm fires: loss or return of mains (with a last-gasp message), over or under voltage, over or under current, sag, peaks, fault passage and direction, earth leakage, pole tilt, switch input. Reported within seconds.'],
+    ['iothub', 'eh', 'Event backbone', 'Routed with priority ahead of routine telemetry.'],
+    ['eh', 'ftel', 'Event handler', 'Separated from telemetry; event code, phase, feeder and time preserved.'],
+    ['ftel', 'q', 'Alert queue', 'Alert envelope queued with retries.'],
+    ['fana', 'q', 'Platform-side events', 'Built-in analytics and Reason findings raise alarm events into the same queue: sustained loading, statutory voltage, phase imbalance, harmonics, leakage trends, data gaps.'],
+    ['q', 'falert', 'Alarm engine', 'Classified by type and severity; duplicates and stale transitions rejected.'],
+    ['falert', 'sql', 'Alarm on the record', 'Alarm raised against the asset; lifecycle Active → Acknowledged → Resolved → Cleared.'],
+    ['falert', 'adt', 'Network context', 'The network graph shows which feeder it is on and which customers sit downstream.'],
+    ['falert', 'sql', 'Incident', 'Related alarms grouped by network connectivity; for a fault, indicators either side and downstream last-gasp messages locate the faulted section.'],
+    ['falert', 'portal', 'Live update', 'Pushed to every operator watching that area; notifications follow the team rules.'],
+    ['portal', 'spa', 'Operator sees it', 'Alarm, incident and downstream customers on one screen.'],
+   ] },
+ { id: 'c', t: 'Notification and escalation', c: '#f4a261', intro: 'Who gets told, how, and what happens if nobody responds.',
+   hops: [
+    ['falert', 'sql', 'Match rules', 'Team rules by region and severity; time-based silences and planned outages applied; duplicates and repeat alarms on the same incident held back.'],
+    ['sql', 'falert', 'Resolve on-duty people', 'Rosters, time zones and quiet hours; non-urgent alerts queued until the morning.'],
+    ['falert', 'sms', 'SMS', 'Urgent alerts to on-duty contacts who chose SMS; rate limits roll the rest into one summary.'],
+    ['falert', 'smtp', 'Email', 'Full context to contacts who chose email; non-urgent alarms go to the digest.'],
+    ['falert', 'falert', 'Escalate', 'No acknowledgement within the response target: next tier notified automatically.'],
+    ['falert', 'sql', 'Delivery and acknowledgement', 'Every send, delivery and acknowledgement recorded against the incident.'],
+    ['sqlapi', 'portal', 'Inbox', 'In-app inbox and activity updated live.'],
+   ] },
+ { id: 'd', t: 'Scheduled reports', c: '#8d6cab', intro: 'From a schedule to an issued, archived report covering the IoT estate and the DSO network.',
+   hops: [
+    ['frep', 'sql', 'Due schedules', 'Schedules by time zone and scope; run-now on demand.'],
+    ['frep', 'q', 'Report job', 'Exactly-once job with an idempotency key.'],
+    ['q', 'frep', 'Build', 'IoT estate (fleet health, firmware and certificates, connectivity, pipeline health, data completeness) or DSO network (network health, statutory power quality, loading, faults, alarm activity).'],
+    ['frep', 'adx', 'Gather evidence', 'Measurements and coverage for the period.'],
+    ['frep', 'blob', 'Archive', 'PDF and Excel issued and archived immutably.'],
+    ['frep', 'smtp', 'Deliver', 'Sent to scoped recipients; delivery recorded.'],
+   ] },
+ { id: 'e', t: 'Firmware rollout (OTA)', c: '#457b9d', intro: 'Signed firmware, staged rings, automatic rollback.',
+   hops: [
+    ['user', 'spa', 'Plan rollout', 'Engineer selects a signed release and the rollout rings.'],
+    ['spa', 'portal', 'Request', 'Change approved by a second person.'],
+    ['portal', 'devapi', 'Device service', 'Rollout plan created and audited.'],
+    ['devapi', 'blob', 'Signed image', 'Image signed in CI; signature verified before release.'],
+    ['devapi', 'iothub', 'Ring 1 (canary)', 'A small group of devices updated first.'],
+    ['iothub', 'pm', 'Install', 'Secure boot verifies the signature; A/B partitions keep the old image.'],
+    ['pm', 'iothub', 'Health report', 'Version, health and measurements reported back.'],
+    ['iothub', 'devapi', 'Gate', 'Healthy: promote to the next ring. Unhealthy: automatic rollback and halt.'],
+   ] },
+ { id: 'f', t: 'Device certificate lifecycle', c: '#264653', intro: 'Issue, renew and revoke, with keys in hardware.',
+   hops: [
+    ['gm', 'iothub', 'CSR', 'Key generated and held in the device\'s secure element; CSR sent.'],
+    ['iothub', 'eh', 'Route', 'CSR travels as an event.'],
+    ['eh', 'fcsr', 'Certificate lifecycle', 'Device entitlement to the requested subject checked.'],
+    ['fcsr', 'vault', 'Certificate authority', 'Called with a managed identity.'],
+    ['vault', 'kv', 'HSM signing', 'Signed inside the HSM; the CA key never leaves it.'],
+    ['vault', 'fcsr', 'Certificate', 'Short-lived certificate returned.'],
+    ['fcsr', 'iothub', 'Deliver', 'Delivered to the device; renewal scheduled before expiry.'],
+    ['vault', 'iothub', 'Revoke', 'Lost or stolen device: certificate revoked and the identity disabled at once.'],
+   ] },
+ { id: 'g', t: 'User action', c: '#6a4c93', intro: 'From sign-in to a change on the record, under zero trust.',
+   hops: [
+    ['user', 'entra', 'Sign in', 'Single sign-on with MFA and conditional access (managed device, location, risk).'],
+    ['entra', 'spa', 'Token', 'Short-lived token with the user\'s roles.'],
+    ['spa', 'portal', 'Request', 'OAuth 2.0 with PKCE over TLS.'],
+    ['portal', 'sqlapi', 'On-behalf-of', 'Downstream call carries the user\'s identity and scopes.'],
+    ['sqlapi', 'sql', 'Scoped write', 'Action-level permission and row-level scope to the user\'s DSO and sites; private endpoint, managed identity.'],
+    ['sqlapi', 'blob', 'Audit', 'Who, what, when and why written to the immutable audit trail.'],
+    ['portal', 'spa', 'Result', 'Result and live update.'],
+   ] },
+ { id: 'h', t: 'Reason finding', c: '#7b61ff', intro: 'The DSO\'s engineering knowledge, applied to evidence at an explicit time.',
+   hops: [
+    ['fsched', 'intapi', 'Evaluate', 'An approved method runs at an explicit evaluation time.'],
+    ['intapi', 'intapi', 'Compile', 'IRL validated against the CKM into an immutable plan.'],
+    ['intapi', 'adx', 'Evidence', 'Signals acquired with source authority and freshness checks; missing evidence stays "not evaluated".'],
+    ['intapi', 'adt', 'Network context', 'Connectivity and ratings from the network graph.'],
+    ['intapi', 'intapi', 'Reason', 'Detection families → evidence → finding → assessment → recommendation, each with references.'],
+    ['intapi', 'sql', 'On the record', 'Finding stored against the asset with full lineage; replayable on any past day.'],
+    ['sqlapi', 'portal', 'To people', 'Each team sees the same finding in its own view; engineers decide.'],
+   ] },
+ { id: 'j', t: 'External data ingestion', c: '#2b9348', intro: 'Telemetry from any other source (vendor head-ends, open data, historians, files) into the time-series store as canonical observations, with lineage.',
+   hops: [
+    ['mon', 'land', 'Vendor head-ends', 'Other companies\' monitoring fleets read from their head-end APIs.'],
+    ['dsoapi', 'land', 'Pull open data', 'Scheduled pulls from DSO open-data APIs.'],
+    ['hist', 'land', 'Read historian', 'Windowed reads from utility historians.'],
+    ['files', 'land', 'File drop', 'A file landing in Blob raises an event.'],
+    ['land', 'fing', 'Adapter', 'Source adapter selected; job identity recorded.'],
+    ['fing', 'blob', 'Raw copy', 'Original bytes kept immutably for lineage.'],
+    ['fing', 'q', 'Chunks', 'Canonical chunks queued; idempotent and replayable.'],
+    ['q', 'fing', 'Chunk worker', 'Validated and attributed.'],
+    ['fing', 'adx', 'Time series', 'Canonical observations with source, unit and quality.'],
+    ['fing', 'sql', 'Lineage', 'Job, chunk and source lineage on the record.'],
+   ] },
+ { id: 'p', t: 'Certified partner device', c: '#0f766e', intro: 'Another manufacturer\'s device, certified once, joins the same pipeline.',
+   hops: [
+    ['cert', 'dps', 'Attested enrolment', 'The device proves a factory identity registered through Phase3 certification.'],
+    ['dps', 'iothub', 'Assigned', 'Allocated to the right hub, tenant and site with an initial twin.'],
+    ['cert', 'iothub', 'Same contract', 'Telemetry, events and twin follow the certified payload contract over mutual TLS.'],
+    ['iothub', 'eh', 'Event backbone', 'No special path: the same stream as Phase3 devices.'],
+    ['eh', 'ftel', 'Telemetry processor', 'Validated against the contract; device model recorded as the source.'],
+    ['ftel', 'adx', 'Time series', 'Readings land alongside every other device, attributed to their source.'],
+    ['ftel', 'q', 'Asset record', 'Latest state flows to the asset record; Reason treats it like any other evidence.'],
+   ] },
+ { id: 'm', t: 'CIM network model import', c: '#bc6c25', intro: 'The DSO\'s own network model becomes the platform\'s.',
+   hops: [
+    ['cim', 'land', 'Receive model', 'CIM XML/RDF delivered to the landing zone.'],
+    ['land', 'fcim', 'CIM adapter', 'Parsed against the agreed CIM profile.'],
+    ['fcim', 'fcim', 'Validate', 'Profile and shape validation; errors reported back to the DSO before anything changes.'],
+    ['fcim', 'sql', 'Asset record', 'Assets created or updated by mRID; history preserved.'],
+    ['fcim', 'adt', 'Network graph', 'Connectivity rebuilt: primary → feeder → transformer → customer.'],
+    ['sqlapi', 'portal', 'Change summary', 'Engineers review what changed.'],
+   ] },
+ { id: 'n', t: 'Findings and limits to DSO systems', c: '#495057', intro: 'Closing the loop with the DSO\'s own systems.',
+   hops: [
+    ['intapi', 'capapi', 'Assessment', 'Capacity assesses a connection or a constraint using findings and the network graph.'],
+    ['capapi', 'fcim', 'CIM limits', 'Flexible-connection limits expressed as CIM OperationalLimitSet / ActivePowerLimit.'],
+    ['fcim', 'dsosys', 'CIM message', 'Sent as an IEC 61968-100 message; acknowledgement recorded.'],
+    ['sqlapi', 'apim', 'Case to work order', 'An agreed case becomes a work-order request.'],
+    ['apim', 'dsosys', 'EAM / OMS', 'Work order created in the DSO\'s own system; crews dispatched there.'],
+    ['dsosys', 'apim', 'Status back', 'Completion status flows back onto the asset record.'],
+   ] },
+],
+TRUST: [
+  ['gm', 'iothub', 'Mutual TLS · X.509 from secure element'],
+  ['pm', 'iothub', 'Mutual TLS · X.509'],
+  ['efi', 'iothub', 'Mutual TLS · X.509'],
+  ['vo', 'iothub', 'Mutual TLS · X.509'],
+  ['cert', 'dps', 'Certified factory identity · attested'],
+  ['mon', 'land', 'Vendor API credentials in Key Vault'],
+  ['dps', 'iothub', 'Attested enrolment'],
+  ['fcsr', 'vault', 'Managed identity · entitled caller'],
+  ['vault', 'kv', 'HSM signing · key never leaves'],
+  ['user', 'entra', 'SSO · MFA · conditional access'],
+  ['spa', 'portal', 'OAuth 2.0 · PKCE'],
+  ['portal', 'sqlapi', 'On-behalf-of token · scoped'],
+  ['sqlapi', 'sql', 'Managed identity · private endpoint · row-level scope'],
+  ['ftel', 'adx', 'Managed identity · private endpoint'],
+  ['fing', 'adx', 'Dedicated ingestion identity'],
+  ['land', 'fing', 'Private endpoint · malware scan'],
+  ['falert', 'teams', 'Managed identity · signed webhooks'],
+  ['apicl', 'apim', 'OAuth client credentials · scopes · quotas'],
+  ['apim', 'dsosys', 'Mutual TLS · signed payloads'],
+  ['fcim', 'dsosys', 'Signed CIM messages · acknowledgements'],
+  ['devapi', 'iothub', 'Managed identity · least-privilege role'],
+],
+SECURITY: [
+  ['Identity for people', 'Entra ID single sign-on, MFA for everyone, conditional access on device, location and risk.'],
+  ['Identity for devices', 'Factory-injected keys in a secure element, attested enrolment, X.509 mutual TLS; partner devices must meet the same bar to be certified.'],
+  ['Identity for services', 'Managed identities on every hop; no connection strings or shared secrets.'],
+  ['Authorisation', 'Action-level permissions; row-level scoping to tenant, DSO and site; least-privilege roles.'],
+  ['Network', 'Private endpoints, VNets and firewalls as code; devices connect outbound only; deny by default.'],
+  ['Keys and certificates', 'CA and secrets in a managed HSM; short-lived certificates; automatic renewal; CRL/OCSP revocation.'],
+  ['Firmware', 'Signed in CI, verified by secure boot, A/B partitions, staged rings, automatic rollback.'],
+  ['Data protection', 'TLS 1.2+ everywhere; encryption at rest with customer-managed keys where the DSO requires them.'],
+  ['Tenant isolation', 'Per-DSO data partitioning, tested by adversarial cross-tenant suites.'],
+  ['Audit and evidence', 'Immutable (WORM) audit trail; every record keeps lineage to its source.'],
+  ['Monitoring and response', 'Central logging and SIEM, alerting, on-call runbooks and incident response.'],
+  ['Secure development', 'Dependency, code and secret scanning in CI; annual penetration testing.'],
+  ['Standards alignment', 'IEC 62443, ETSI EN 303 645, ISO 27001 and NIS/CAF outcomes mapped to controls.'],
+],
+CAPS: [
+  ['Measure', 'Device family', 'Ground-mounted, pole-mounted, directional fault indicator and single-feeder / voltage-only monitors on one contract.'],
+  ['Measure', 'Partner device certification', 'Other manufacturers\' devices certified for identity, payload contract and security, then onboarded like ours.'],
+  ['Measure', 'Zero-touch provisioning', 'Attested enrolment, QR/serial claim, assignment to tenant and site.'],
+  ['Measure', 'Commissioning', 'Bind device to transformer and feeders from the network graph.'],
+  ['Measure', 'Configuration', 'Thresholds, triggers, actions and publishing profile through the twin.'],
+  ['Measure', 'Commands', 'Direct methods with audit and reconciliation.'],
+  ['Measure', 'Firmware rollout', 'Signed images, staged rings, health gates, automatic rollback.'],
+  ['Measure', 'Certificate lifecycle', 'HSM-backed issue, automatic renewal, revocation.'],
+  ['Measure', 'Fleet health', 'Heartbeat, connectivity, mains state, SIM usage, certificate and firmware posture.'],
+  ['Manage', 'Native ingestion', 'Device batches to time series, latest state and alarms.'],
+  ['Manage', 'External ingestion', 'Telemetry from vendor head-ends, DSO open-data APIs, historians and files into the time-series store, with lineage.'],
+  ['Manage', 'CIM import and export', 'Profile-validated network models in; findings and limits out.'],
+  ['Manage', 'Asset record (CRM of the grid)', 'One record per asset: identity, context, readings, alarms, findings, cases, decisions.'],
+  ['Manage', 'Network graph', 'Connectivity from primary to customer.'],
+  ['Manage', 'Data quality', 'Freshness, completeness, unit and identity checks; bad data held back and explained.'],
+  ['Manage', 'Alarms and incidents', 'Lifecycle, grouping by connectivity, downstream customers.'],
+  ['Manage', 'Contacts and teams', 'Teams with rosters and on-call; each contact chooses SMS, email or both.'],
+  ['Manage', 'Notification rules', 'Per team and severity: immediate, digest or off; SMS, email or both.'],
+  ['Manage', 'Time-based silences', 'Planned outages, storm mode, maintenance windows; expire automatically; never hide an unexpected loss of mains.'],
+  ['Manage', 'Flood control', 'De-duplication, grouping into incidents, rate limits with summaries, quiet hours, escalation.'],
+  ['Manage', 'Cases, work and handover', 'Ownership, follow-through, handover; work orders into DSO systems.'],
+  ['Manage', 'Built-in compliance', 'Statutory voltage, harmonics and imbalance checks.'],
+  ['Manage', 'Scheduled reporting', 'IoT estate (fleet, firmware, connectivity, pipelines, completeness) and DSO network (health, PQ, loading, faults, alarms); PDF, Excel, email; archived.'],
+  ['Manage', 'Continuous monitoring', 'Monitors on devices, pipelines, data sources and the network raise alarms through the same rules.'],
+  ['Manage', 'Maps and GIS', 'Live map, layers, heatmaps, planned outages, blast radius on the graph.'],
+  ['Reason', 'Method language (IRL)', 'Engineering intent written once, compiled against the CKM.'],
+  ['Reason', 'Governed runtime', 'Detection families, explicit evaluation time, explained findings.'],
+  ['Reason', 'Replay', 'Any day re-run with the same plan and evidence.'],
+  ['Reason', 'Governance', 'Compile, replay, multi-discipline approval, version history.'],
+  ['Reason', 'AI drafting', 'Plain language to draft methods; people approve.'],
+  ['Reason', 'Capacity', 'Headroom, connection checks, flexible limits, flexibility verification.'],
+  ['Reason', 'Evidence pack', 'Per-transformer evidence for regulators and planners.'],
+  ['Clients', 'Operator portal', 'Dashboard, map, command, record, cases, reports.'],
+  ['Clients', 'Public APIs and webhooks', 'Versioned APIs through the gateway for DSO tools and partners.'],
+  ['Clients', 'DSO system integration', 'CIM messages and work orders with acknowledgements.'],
+  ['Foundation', 'Identity and access', 'SSO, MFA, managed identities, scoped roles.'],
+  ['Foundation', 'Keys and secrets', 'Managed HSM, rotation by policy.'],
+  ['Foundation', 'Observability', 'Logs, traces, metrics, SIEM, SLOs.'],
+  ['Foundation', 'Deployment', 'Infrastructure as code for managed, hybrid and self-managed models.'],
+],
+REPORTS: [
+  ['Operations brief', 'Shift summary: pressure, leading regions and feeders, backlog'],
+  ['Command discipline', 'Ownership, response, overdue obligations'],
+  ['Network health', 'Health and compliance indicators'],
+  ['Substation watch', 'Stress and attention priorities'],
+  ['Network behaviour', 'Peak growth, imbalance, export signatures'],
+  ['Statutory power quality', 'Voltage, harmonics and imbalance against the standards'],
+  ['Monthly loading', 'Per-substation peaks and headroom'],
+  ['Data completeness', 'Coverage and gaps by source'],
+  ['Connectivity', 'Fleet connection stability'],
+  ['Work and recovery', 'Open work and close-out with evidence'],
+],
+POLICY: [
+  ['Raw device telemetry', 'Hot cache for recent data, warm in the time-series store, cold archive per DSO policy'],
+  ['Source files', 'Immutable raw copy for lineage'],
+  ['Asset record', 'Kept for the life of the asset; history preserved through replacement'],
+  ['Alarms, incidents, cases', 'Retained per regulatory requirement'],
+  ['Findings and executions', 'Retained with plan versions so any day can be replayed'],
+  ['Issued reports', 'Immutable archive'],
+  ['Audit', 'Immutable (WORM), retention agreed with the DSO'],
+  ['Personal data', 'Minimised, purpose-bound, subject-rights workflow'],
+],
+LIFECYCLE: [
+  ['Manufacture', 'Key generated in the secure element; identity registered.'],
+  ['Enrol', 'Attested enrolment through DPS.'],
+  ['Claim', 'QR/serial claim assigns the device to a DSO and site.'],
+  ['Commission', 'Bound to transformer and feeders from the network graph.'],
+  ['Configure', 'Thresholds, triggers, actions and publishing profile.'],
+  ['Operate', 'Telemetry, events, health and mains-state monitoring.'],
+  ['Update', 'Signed firmware through staged rings with rollback.'],
+  ['Renew', 'Certificates renewed automatically before expiry.'],
+  ['Replace', 'Successor inherits the asset binding; history preserved.'],
+  ['Decommission', 'Certificate revoked, identity disabled, device wiped.'],
+],
+DEPLOY: [
+  ['Fully managed', 'Phase3 runs the whole platform; the DSO pays for insight, not infrastructure.'],
+  ['Hybrid', 'Phase3 manages devices and ingestion; the DSO keeps its analytics platform and receives data and findings through CIM and APIs.'],
+  ['Self-managed', 'The complete platform deployed as infrastructure-as-code into the DSO\'s own tenant.'],
+],
+ENGINEERING: [
+  ['CI/CD', 'Every change built, tested, scanned and released through pipelines.'],
+  ['Infrastructure as code', 'Every environment reproducible from code.'],
+  ['Testing', 'Unit, integration, end-to-end, hardware-in-the-loop for the device.'],
+  ['Performance', 'Load and soak tests at fleet scale.'],
+  ['Resilience', 'Chaos tests, backups, restore drills and regional failover.'],
+  ['Security', 'Scanning in CI and regular penetration tests.'],
+],
+SCENARIOS: [
+  { t: 'A device goes quiet', nodes: ['vo', 'iothub', 'fconn', 'sql', 'intapi', 'spa'],
+    steps: ['Telemetry stops arriving.', 'Fleet health compares last communication with the expected interval and checks for a last-gasp message.', 'No last gasp: flagged as a communications problem. Last gasp received: loss of mains.', 'Reason marks the asset "not evaluated" until evidence returns; the portal shows a visibility gap, not spare capacity.'],
+    out: 'Operators know whether to send a comms technician or treat it as a supply loss.' },
+  { t: 'A fault on an LV feeder', nodes: ['efi', 'gm', 'eh', 'ftel', 'q', 'falert', 'adt', 'sql', 'sms', 'teams', 'spa'],
+    steps: ['Fault indicators report fault passage and direction; downstream monitors send last-gasp messages.', 'One incident raised; the faulted section located between indicators on the network graph.', 'Downstream customers identified from the network graph.', 'On-duty staff alerted by SMS and Teams; escalation if nobody acknowledges.', 'Supply restored: alarm clears, and the incident closes when recovery is measured.'],
+    out: 'One incident with the affected customers, owned and acknowledged.' },
+  { t: 'Alert at 02:00', nodes: ['falert', 'sql', 'sms', 'teams', 'smtp'],
+    steps: ['Rule matches a 02:00 event.', 'Urgent: on-call engineer paged by SMS; escalates after the response target.', 'Non-urgent: queued for the morning shift\'s briefing.'],
+    out: 'Nobody is woken for a non-urgent alert, and nothing urgent goes unanswered.' },
+  { t: 'Stolen or compromised device', nodes: ['pm', 'iothub', 'fcsr', 'vault', 'kv', 'spa'],
+    steps: ['Operator marks the device compromised.', 'Certificate revoked; identity disabled in IoT Hub.', 'Any further traffic is refused and logged in the SIEM.', 'A replacement inherits the asset binding and history.'],
+    out: 'Contained in minutes, with the record intact.' },
+  { t: 'A partner device joins the fleet', nodes: ['cert', 'dps', 'iothub', 'eh', 'ftel', 'adx', 'sql'],
+    steps: ['A certified partner device powers up on site.', 'Attested enrolment assigns it to the DSO and site.', 'Its telemetry follows the certified contract through the same pipeline.', 'It appears on the asset record and feeds Reason like any Phase3 device.'],
+    out: 'More coverage without a new integration project or a new silo.' },
+  { t: 'Firmware rollout goes wrong', nodes: ['spa', 'portal', 'devapi', 'blob', 'iothub', 'pm'],
+    steps: ['Ring 1 devices install the new image.', 'Health reports show a fault on several devices.', 'Rollout halts; affected devices roll back to the previous partition.', 'The release is quarantined for investigation.'],
+    out: 'The fleet never runs a bad image beyond the canary ring.' },
+  { t: 'A bad CIM model arrives', nodes: ['cim', 'land', 'fcim', 'sql', 'adt', 'spa'],
+    steps: ['Model fails profile validation (missing connectivity).', 'Nothing changes on the record or graph.', 'A validation report goes back to the DSO\'s GIS team.', 'The corrected model imports cleanly; changes are reviewed.'],
+    out: 'The record is never corrupted by a bad import.' },
+  { t: 'A connection request near the limit', nodes: ['apicl', 'apim', 'capapi', 'intapi', 'adt', 'fcim', 'dsosys'],
+    steps: ['A 60 kW EV charger request arrives through the API.', 'Capacity checks measured headroom on the network graph.', 'Answer: connect with a flexible limit at the evening peak.', 'Limit sent to DSO systems as a CIM OperationalLimitSet; delivery verified by measurement later.'],
+    out: 'A faster answer, on evidence the DSO owns, that its systems can act on.' },
+],
+TOUR: [
+  { tab: 'map', title: 'The complete platform', say: 'This is the Phase3 platform as a complete system, laid out on Microsoft\'s Azure IoT reference architecture. Things on the left, our device family, certified partner devices and other data sources, then the cloud gateway, processing, storage and platform services. Clients are on the right: the operator portal is one of them. Identity, keys and monitoring run underneath everything.' },
+  { tab: 'map', node: 'sql', title: 'The CRM of the grid', say: 'At the centre is the asset record: one trusted record per asset, with its identity, readings, alarms, findings, cases and decisions. It is fed by any source, not just Phase3 devices.' },
+  { tab: 'map', flow: 'a', title: 'Follow a reading', say: 'Follow one reading. It leaves the device over mutual TLS, travels through IoT Hub and the event backbone, is validated and normalised, lands in the time-series store and on the asset record, and refreshes the operator\'s screen.' },
+  { tab: 'map', flow: 'b', title: 'Every event becomes an alarm', say: 'Any of the event algorithms can raise an alarm. On the device: loss of mains with a last-gasp message, over or under voltage and current, sags, fault passage and direction, earth leakage, pole tilt. In the platform: sustained loading, statutory voltage, imbalance and data gaps. They all follow the same path: the alarm engine raises the alarm, groups related alarms into an incident on the network graph, and shows the customers downstream.' },
+  { tab: 'map', flow: 'm', title: 'The DSO\'s own model', say: 'The DSO\'s network model arrives as CIM. It is validated against the agreed profile, then builds the asset record and the network graph, using the DSO\'s own identifiers.' },
+  { tab: 'map', flow: 'n', title: 'Closing the loop', say: 'Findings and limits go back to the DSO\'s systems: flexible limits as CIM messages, and agreed cases as work orders in their asset and outage systems, with acknowledgements back on the record.' },
+  { tab: 'map', lens: true, title: 'Zero trust on every hop', say: 'Switch on the trust lens: every hop proves who it is. Devices use certificates from a secure element, people sign in with MFA, services use managed identities, and keys stay in the HSM.' },
+  { tab: 'scen', title: 'When things go wrong', say: 'The scenarios show the system under pressure: a device goes quiet, a firmware rollout fails, a bad model arrives, or a connection request comes in near the limit. Each ends in a controlled outcome.' },
+  { tab: 'alert', title: 'Alerts without the flood', say: 'Teams and contacts decide what reaches them, by SMS or email. Time-based silences cover planned work and storms, and flood controls group repeat alarms into incidents and roll the rest into summaries. On a storm day, thousands of messages become a few hundred, and every critical incident still reaches the control room.' },
+  { tab: 'rep', title: 'Reports on the whole estate', say: 'Reports run on schedule across the whole estate: the devices, the gateway, the pipelines and data sources, and the DSO network itself. Continuous monitors raise alarms through the same teams and rules.' },
+  { tab: 'ops', title: 'Run it any way the DSO wants', say: 'And it can run the way the DSO needs: fully managed by Phase3, hybrid alongside the DSO\'s own analytics, or self-managed in their own tenant.' },
+],
+};
+
+</script>
+
+<script>
+(() => {
+'use strict';
+const D = window.ARCH;
+const $ = (s, e = document) => e.querySelector(s), $$ = (s, e = document) => [...e.querySelectorAll(s)];
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const ST = Object.keys(D.LAYERS);
+const stc = s => `<span class="st L" style="color:var(--${s});background:var(--${s}bg)">${s}</span>`;
+const colVar = s => `var(--${s})`;
+const bgVar = s => `var(--${s}bg)`;
+const N = Object.fromEntries(D.NODES.map(n => [n.id, n]));
+const S = { tab: 'map', flow: null, hop: -1, lens: false, sel: null, playing: false, scen: null };
+try { document.documentElement.dataset.theme = localStorage.getItem('p3a.theme') || 'light'; } catch (e) { }
+
+const TABS = [['map', 'Architecture & packet flows'], ['scen', 'What if…'], ['alert', 'Alerting'], ['rep', 'Reports & monitoring'], ['life', 'Lifecycles'], ['cat', 'Capabilities'], ['sec', 'Zero trust'], ['ops', 'Operating model']];
+function tabs() { $('#tabs').innerHTML = TABS.map(([k, t]) => `<button data-t="${k}" class="${S.tab === k ? 'on' : ''}">${t}</button>`).join(''); $$('#tabs button').forEach(b => b.onclick = () => go(b.dataset.t)); }
+function go(t) { stopFlow(); S.tab = t; tabs(); V[t]($('#main')); window.scrollTo(0, 0); }
+
+/* ── geometry ─────────────────────────────────── */
+const NW = 186, NH = 40, Y0 = 46, RS = 54;
+const pos = n => ({ x: D.COLS[n.c].x + 6, y: Y0 + n.r * RS + (n.r > 11 ? 4 : 0) });
+const W = 1300, BAND = Y0 + 11.05 * RS, H = Y0 + 12.55 * RS;
+function edgePath(a, b) {
+  const A = pos(N[a]), B = pos(N[b]);
+  if (a === b) { const x = A.x + NW, y = A.y + NH / 2; return `M${x},${y - 8} C${x + 46},${y - 34} ${x + 46},${y + 34} ${x},${y + 8}`; }
+  let x1, y1, x2, y2;
+  if (N[a].c === N[b].c) { x1 = A.x + NW; y1 = A.y + NH / 2; x2 = B.x + NW; y2 = B.y + NH / 2; const k = 40 + Math.abs(y2 - y1) * .15; return `M${x1},${y1} C${x1 + k},${y1} ${x2 + k},${y2} ${x2},${y2}`; }
+  const fwd = B.x > A.x; x1 = fwd ? A.x + NW : A.x; y1 = A.y + NH / 2; x2 = fwd ? B.x : B.x + NW; y2 = B.y + NH / 2;
+  const dx = Math.max(40, Math.abs(x2 - x1) * .45) * (fwd ? 1 : -1);
+  return `M${x1},${y1} C${x1 + dx},${y1} ${x2 - dx},${y2} ${x2},${y2}`;
+}
+const EDGES = (() => { const m = new Map(); D.FLOWS.forEach(f => f.hops.forEach(h => { if (h[0] !== h[1]) m.set(h[0] + '>' + h[1], 1); })); D.TRUST.forEach(t => m.set(t[0] + '>' + t[1], 1)); return m; })();
+
+function mapSvg() {
+  let g = '';
+  D.COLS.forEach((c, i) => { g += `<rect class="zone" x="${c.x}" y="8" width="${NW + 12}" height="${BAND - 16}" rx="12"/><text class="zt" x="${c.x + 12}" y="26">${esc(c.t.toUpperCase())}</text><text class="ns" x="${c.x + 12}" y="38" style="fill:var(--muted);font-size:9.5px">${esc(c.sub)}</text>`; });
+  g += `<rect class="zone" x="16" y="${BAND}" width="${D.COLS[5].x + NW + 12 - 16}" height="${H - BAND - 8}" rx="12" style="fill:none;stroke:var(--line2);stroke-dasharray:4 4"/><text class="zt" x="30" y="${BAND + 20}">FOUNDATION</text><text class="ns" x="30" y="${BAND + 34}" style="fill:var(--muted);font-size:9.5px">identity · keys · monitoring</text>`;
+  if (N.gm && N.vo) { const a = pos(N.gm), b = pos(N.vo); g += `<rect x="${a.x - 6}" y="${a.y - 14}" width="${NW + 12}" height="${b.y + NH - a.y + 20}" rx="11" fill="none" stroke="var(--Measure)" stroke-dasharray="5 4"/><text x="${a.x + 2}" y="${a.y - 4}" style="fill:var(--Measure);font-size:9.5px;font-weight:700">PHASE3 DEVICE FAMILY</text>`; }
+  { const a = pos(N.spa), b = pos(N.portal); g += `<rect x="${a.x - 6}" y="${a.y - 16}" width="${NW + 12}" height="${b.y + NH - a.y + 22}" rx="11" fill="none" stroke="var(--accent)" stroke-dasharray="5 4"/><text x="${a.x + 2}" y="${a.y - 5}" style="fill:var(--accent);font-size:9.5px;font-weight:700">ONE CLIENT OF THE PLATFORM</text>`; }
+  g += '<g id="edges">';
+  EDGES.forEach((st, k) => { const [a, b] = k.split('>'); g += `<path class="edge" data-e="${k}" d="${edgePath(a, b)}"/>`; });
+  g += '</g><g id="nodes">';
+  D.NODES.forEach(n => { const p = pos(n); g += `<g class="node" data-n="${n.id}" transform="translate(${p.x},${p.y})"><rect width="${NW}" height="${NH}" fill="${bgVar(n.layer)}" stroke="${colVar(n.layer)}"/>
+    <text class="nn" x="10" y="17">${esc(n.n)}</text><text class="ns" x="10" y="31">${esc(n.s)}</text><circle cx="${NW - 11}" cy="11" r="4" fill="${colVar(n.layer)}"/></g>`; });
+  g += '</g><g id="lens"></g><g id="pk"></g>';
+  return `<svg id="map" viewBox="0 0 ${W} ${H}" role="img" aria-label="Platform architecture">${g}</svg>`;
+}
+
+/* ── map view ─────────────────────────────────── */
+const V = {};
+V.map = el => {
+  el.innerHTML = `<p class="lede">The Phase3 platform as a complete system, laid out on the Microsoft Azure IoT reference architecture: things → cloud gateway → processing → storage → platform services, with clients consuming it. The operator portal is one client of the platform. Click any component; pick a flow to watch a packet travel hop by hop.</p>
+  <div class="toolbar"><select id="flowSel"><option value="">Choose a packet flow…</option>${D.FLOWS.map(f => `<option value="${f.id}">${esc(f.t)}</option>`).join('')}</select>
+   <button class="btn" id="bPlay" disabled>▶ Play</button><button class="btn" id="bPrev" disabled>←</button><button class="btn" id="bNext" disabled>→</button><button class="btn" id="bLens">🔒 Trust lens</button><button class="btn" id="bReset">Reset</button>
+   <span class="sp"></span><div class="legend">${ST.map(s => stc(s)).join('')}</div></div>
+  <div class="mapwrap"><div>${mapSvg()}</div><div class="card panel" id="side"></div></div>`;
+  $$('#map .node').forEach(g => g.onclick = () => showNode(g.dataset.n));
+  $('#flowSel').onchange = e => e.target.value ? setFlow(e.target.value) : resetMap();
+  $('#bPlay').onclick = () => S.playing ? stopFlow(true) : playFlow();
+  $('#bNext').onclick = () => { stopFlow(true); stepTo(S.hop + 1); };
+  $('#bPrev').onclick = () => { stopFlow(true); stepTo(S.hop - 1); };
+  $('#bLens').onclick = () => setLens(!S.lens);
+  $('#bReset').onclick = () => { $('#flowSel').value = ''; S.lens = false; $('#bLens').classList.remove('on'); $('#lens').innerHTML = ''; resetMap(); };
+  setLens(S.lens); resetMap();
+};
+function overview() {
+  return `<h3>The platform in one sentence</h3><p class="note" style="margin-top:0">Measure gives field truth, Manage keeps one trusted record for every asset (the CRM of the grid), and Reason applies the DSO's own engineering judgement, all on a zero-trust foundation that any client can use.</p>
+  ${ST.map(s => `<div style="font-size:12.8px;padding:3px 0">${stc(s)} ${esc(D.LAYERS[s])}</div>`).join('')}
+  <h3 style="margin-top:12px">Packet flows</h3>${D.FLOWS.map(f => `<div class="hop" data-f="${f.id}"><span class="n" style="background:${f.c};color:#fff;border-color:${f.c}">${f.id}</span><div><b>${esc(f.t)}</b><div class="note">${esc(f.intro)}</div></div></div>`).join('')}`;
+}
+function resetMap() { stopFlow(); S.flow = null; S.hop = -1; S.sel = null; $$('#map .node').forEach(n => n.classList.remove('dim', 'hot', 'sel')); $$('#map .edge').forEach(e => { e.classList.remove('on', 'dim'); e.style.stroke = ''; });
+  $('#pk').innerHTML = ''; ['bPlay', 'bPrev', 'bNext'].forEach(i => $('#' + i).disabled = true); $('#side').innerHTML = overview(); $$('#side [data-f]').forEach(h => h.onclick = () => { $('#flowSel').value = h.dataset.f; setFlow(h.dataset.f); }); }
+function showNode(id) {
+  const n = N[id]; S.sel = id; $$('#map .node').forEach(g => g.classList.toggle('sel', g.dataset.n === id));
+  const flows = D.FLOWS.filter(f => f.hops.some(h => h[0] === id || h[1] === id));
+  const trust = D.TRUST.filter(t => t[0] === id || t[1] === id);
+  $('#side').innerHTML = `<div class="note">${esc(n.r > 11 ? 'Foundation' : D.COLS[n.c].t)}</div><h3 style="margin:2px 0 6px;font-size:17px">${esc(n.n)} ${stc(n.layer)}</h3><div class="note" style="margin-bottom:8px">${esc(n.s)}</div>
+   <p style="margin:0 0 8px">${esc(n.p)}</p><div class="kv"><div>In → out</div><div>${esc(n.io)}</div></div>
+   ${n.b ? `<div class="okb"><b>Why it matters.</b> ${esc(n.b)}</div>` : ''}
+   ${trust.length ? `<h3 style="margin-top:12px">Identity on its links</h3>${trust.map(t => `<div style="font-size:12.8px;padding:3px 0">🔒 ${esc(N[t[0]].n)} → ${esc(N[t[1]].n)}: ${esc(t[2])}</div>`).join('')}` : ''}
+   ${flows.length ? `<h3 style="margin-top:12px">Appears in</h3>${flows.map(f => `<div class="hop" data-f="${f.id}"><span class="n" style="background:${f.c};color:#fff;border-color:${f.c}">${f.id}</span><div><b>${esc(f.t)}</b></div></div>`).join('')}` : ''}
+   <div style="margin-top:12px"><button class="btn" id="bBack">← All flows</button></div>`;
+  $$('#side [data-f]').forEach(h => h.onclick = () => { $('#flowSel').value = h.dataset.f; setFlow(h.dataset.f); });
+  $('#bBack').onclick = () => { S.sel = null; $$('#map .node').forEach(g => g.classList.remove('sel')); if (S.flow) renderHops(); else $('#side').innerHTML = overview(), $$('#side [data-f]').forEach(h => h.onclick = () => { $('#flowSel').value = h.dataset.f; setFlow(h.dataset.f); }); };
+}
+function setFlow(id) {
+  stopFlow(); S.flow = D.FLOWS.find(f => f.id === id); S.hop = -1;
+  const ids = new Set(S.flow.hops.flatMap(h => [h[0], h[1]])), ek = new Set(S.flow.hops.map(h => h[0] + '>' + h[1]));
+  $$('#map .node').forEach(n => { n.classList.toggle('dim', !ids.has(n.dataset.n)); n.classList.remove('hot', 'sel'); });
+  $$('#map .edge').forEach(e => { const on = ek.has(e.dataset.e); e.classList.toggle('dim', !on); e.classList.remove('on'); e.style.stroke = on ? S.flow.c : ''; e.style.opacity = on ? .45 : ''; });
+  ['bPlay', 'bPrev', 'bNext'].forEach(i => $('#' + i).disabled = false); $('#pk').innerHTML = '';
+  renderHops(); if (S.lens) setLens(true);
+}
+function renderHops() {
+  const f = S.flow;
+  $('#side').innerHTML = `<div class="note">Packet flow ${f.id}</div><h3 style="margin:2px 0 4px;font-size:17px">${esc(f.t)}</h3><p style="margin:0 0 6px;color:var(--text2)">${esc(f.intro)}</p>
+   ${f.hops.map((h, i) => `<div class="hop ${i === S.hop ? 'cur' : i < S.hop ? 'done' : ''}" data-h="${i}"><span class="n">${i + 1}</span><div style="min-width:0"><b>${esc(h[2])}</b><div class="note">${esc(N[h[0]].n)}${h[0] !== h[1] ? ' → ' + esc(N[h[1]].n) : ''}</div><div class="d">${esc(h[3])}</div></div></div>`).join('')}`;
+  $$('#side .hop').forEach(x => x.onclick = () => { stopFlow(true); stepTo(+x.dataset.h); });
+  const cur = $('#side .hop.cur'); if (cur) cur.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+}
+let timer = null, raf = null;
+function stepTo(i, cb) {
+  const f = S.flow; if (!f) return; if (i < 0) i = 0; if (i >= f.hops.length) { S.hop = f.hops.length; renderHops(); if (cb) cb(true); return; }
+  S.hop = i; const h = f.hops[i]; renderHops();
+  $$('#map .node').forEach(n => n.classList.toggle('hot', n.dataset.n === h[0] || n.dataset.n === h[1]));
+  $$('#map .edge').forEach(e => e.classList.toggle('on', e.dataset.e === h[0] + '>' + h[1]));
+  animatePacket(h, f.c, () => cb && cb(false));
+}
+function animatePacket(h, col, done) {
+  cancelAnimationFrame(raf); const pk = $('#pk'); pk.innerHTML = '';
+  if (h[0] === h[1]) { const p = pos(N[h[0]]); pk.innerHTML = `<circle cx="${p.x + NW / 2}" cy="${p.y + NH / 2}" r="6" fill="${col}"><animate attributeName="r" values="6;26;6" dur="1.1s" repeatCount="2"/><animate attributeName="opacity" values="1;.2;1" dur="1.1s" repeatCount="2"/></circle>`; setTimeout(done, 1300); return; }
+  const path = $(`#map .edge[data-e="${h[0]}>${h[1]}"]`); if (!path) { done(); return; }
+  const L = path.getTotalLength(), dash = false;
+  pk.innerHTML = `<circle r="7" fill="${col}" stroke="#fff" stroke-width="2" ${dash ? 'opacity=".6"' : ''}/><text font-size="10" font-weight="700" fill="#fff" text-anchor="middle" dy="3.5">${S.hop + 1}</text>`;
+  const c = pk.querySelector('circle'), t = pk.querySelector('text'), t0 = performance.now(), dur = Math.min(1500, 500 + L * 1.4);
+  const f = now => { const k = Math.min(1, (now - t0) / dur), e = k < .5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2, pt = path.getPointAtLength(L * e);
+    c.setAttribute('cx', pt.x); c.setAttribute('cy', pt.y); t.setAttribute('x', pt.x); t.setAttribute('y', pt.y); if (k < 1) raf = requestAnimationFrame(f); else done(); };
+  raf = requestAnimationFrame(f);
+}
+function playFlow(onEnd) {
+  if (!S.flow) return; S.playing = true; $('#bPlay').textContent = '❚❚ Pause';
+  const next = () => { if (!S.playing) return; stepTo(S.hop + 1, end => { if (end || !S.playing) { const done = end && S.playing; stopFlow(true); if (done && typeof onEnd === 'function') onEnd(); return; } timer = setTimeout(next, 1600); }); };
+  if (S.hop >= S.flow.hops.length - 1) S.hop = -1; next();
+}
+function stopFlow(keep) { S.playing = false; clearTimeout(timer); if ($('#bPlay')) $('#bPlay').textContent = '▶ Play'; if (!keep) cancelAnimationFrame(raf); }
+function setLens(on) {
+  S.lens = on; const b = $('#bLens'); if (b) b.classList.toggle('on', on); const g = $('#lens'); if (!g) return; g.innerHTML = '';
+  if (!on) { if (!S.flow && !S.sel && $('#side')) resetMap(); return; }
+  D.TRUST.forEach((t, i) => { const p = $(`#map .edge[data-e="${t[0]}>${t[1]}"]`); if (!p) return; const L = p.getTotalLength(), m = p.getPointAtLength(L * (.42 + (i % 3) * .08));
+    g.innerHTML += `<g class="lk" data-k="${i}" style="cursor:pointer" transform="translate(${m.x},${m.y})"><title>${esc(N[t[0]].n)} → ${esc(N[t[1]].n)}: ${esc(t[2])}</title><circle r="10" fill="var(--panel)" stroke="var(--accent)" stroke-width="1.8"/><text text-anchor="middle" dy="3.6" font-size="10" font-weight="700" fill="var(--accent)">${i + 1}</text></g>`; });
+  if (!S.flow && !S.sel) {
+    const ek = new Set(D.TRUST.map(t => t[0] + '>' + t[1]));
+    $$('#map .edge').forEach(e => { const on = ek.has(e.dataset.e); e.classList.toggle('dim', !on); e.classList.toggle('on', on); e.style.stroke = on ? 'var(--accent)' : ''; });
+    $('#side').innerHTML = `<h3>Trust lens</h3><p class="note" style="margin-top:0">How each side of a link proves who it is. Numbers match the lock markers on the map.</p>${D.TRUST.map((t, i) => `<div class="hop done" data-k="${i}"><span class="n" style="background:var(--panel);color:var(--accent);border-color:var(--accent)">${i + 1}</span><div class="d" style="display:block"><b>${esc(N[t[0]].n)} → ${esc(N[t[1]].n)}</b><br>${esc(t[2])}</div></div>`).join('')}<div class="okb">Every hop authenticates, is authorised for exactly what it needs, and is logged. See the Zero trust tab.</div>`;
+  }
+  $$('#lens .lk').forEach(x => x.onclick = () => { const t = D.TRUST[+x.dataset.k]; $$('#map .edge').forEach(e => e.classList.toggle('on', e.dataset.e === t[0] + '>' + t[1])); });
+}
+
+/* ── scenarios ───────────────────────────────── */
+V.scen = el => {
+  el.innerHTML = `<p class="lede">How the complete system behaves when something goes wrong. Pick a scenario; the components involved light up on the map.</p>
+  <div class="mapwrap"><div>${mapSvg()}</div><div class="grid" style="align-content:start" id="scList">${D.SCENARIOS.map((s, i) => `<div class="card scen" data-s="${i}"><h3>${esc(s.t)}</h3><div class="note">${s.nodes.length} components</div></div>`).join('')}</div></div>`;
+  $$('#map .node').forEach(g => g.onclick = () => go('map') || showNode(g.dataset.n));
+  $$('.scen', el).forEach(c => c.onclick = () => showScen(+c.dataset.s));
+  showScen(S.scen ?? 0);
+};
+function showScen(i) {
+  S.scen = i; const s = D.SCENARIOS[i], ids = new Set(s.nodes);
+  $$('.scen').forEach(c => { c.classList.toggle('on', +c.dataset.s === i); if (+c.dataset.s !== i) c.innerHTML = `<h3>${esc(D.SCENARIOS[+c.dataset.s].t)}</h3><div class="note">${D.SCENARIOS[+c.dataset.s].nodes.length} components</div>`; });
+  const c = $(`.scen[data-s="${i}"]`);
+  c.innerHTML = `<h3>${esc(s.t)}</h3>${s.steps.map((x, k) => `<div class="hop done"><span class="n">${k + 1}</span><div class="d" style="display:block">${esc(x)}</div></div>`).join('')}<div class="okb"><b>Outcome.</b> ${esc(s.out)}</div>`;
+  $$('#map .node').forEach(n => { n.classList.toggle('dim', !ids.has(n.dataset.n)); n.classList.toggle('hot', ids.has(n.dataset.n)); });
+  $$('#map .edge').forEach(e => { const [a, b] = e.dataset.e.split('>'); const on = ids.has(a) && ids.has(b); e.classList.toggle('dim', !on); e.classList.toggle('on', on); e.style.stroke = on ? 'var(--accent)' : ''; });
+}
+
+/* ── lifecycles ─────────────────────────────── */
+V.life = el => {
+  const chain = (arr, note) => `<div class="states">${arr.map((s, i) => (i ? '<span class="arr">→</span>' : '') + `<span class="state">${esc(s)}</span>`).join('')}</div>${note ? `<div class="note">${esc(note)}</div>` : ''}`;
+  el.innerHTML = `<p class="lede">The lifecycles behind alarms, incidents, notifications, reports, work and devices.</p>
+  <div class="grid" style="grid-template-columns:repeat(2,minmax(0,1fr))">
+   <div class="card"><h3>Alarm</h3>${chain(['Active', 'Acknowledged', 'Resolved', 'Cleared'], 'Raised against the asset on the record; every action is recorded.')}
+     <div class="note" style="margin-top:8px">Device events: loss / return of mains (last gasp) · over / under voltage · over / under current · sag · peaks · earth leakage · switch input</div></div>
+   <div class="card"><h3>Incident</h3>${chain(['Open', 'Investigating', 'Recovery measured', 'Closed'], 'Alarms grouped by network connectivity; downstream customers identified from the network graph.')}
+     <div class="okb">An incident closes only when recovery is measured, not just when a form is completed.</div></div>
+   <div class="card"><h3>Notification and escalation</h3><div class="funnel">
+     <div>1 · Rule match: role, site, region, severity</div><div style="margin-left:14px">2 · Silences and planned outages applied</div>
+     <div style="margin-left:28px">3 · On-duty people from rosters and time zones</div><div style="margin-left:42px">4 · Urgent now; non-urgent queued for the morning</div>
+     <div style="margin-left:56px">5 · Channel: SMS · Teams · push · email · webhook · in-app</div><div style="margin-left:70px">6 · No acknowledgement in time → next tier</div>
+     <div style="margin-left:84px">7 · Delivery and acknowledgement on the record</div></div></div>
+   <div class="card"><h3>Reports</h3>${chain(['Schedule or request', 'Job (exactly once)', 'Evidence gathered', 'HTML · PDF · Excel', 'Archived', 'Delivered'])}
+     <table style="margin-top:8px">${D.REPORTS.map(r => `<tr><td><b>${esc(r[0])}</b></td><td>${esc(r[1])}</td></tr>`).join('')}</table></div>
+   <div class="card"><h3>Finding to outcome</h3>${chain(['Finding', 'Case', 'Owner', 'Work order (DSO system)', 'Handover', 'Outcome measured'], 'Cases carry the finding and its evidence; work orders go into the DSO\'s own EAM/OMS, and completion flows back onto the record.')}</div>
+   <div class="card"><h3>Device lifecycle</h3><table>${D.LIFECYCLE.map((r, i) => `<tr><td style="width:24px" class="note">${i + 1}</td><td><b>${esc(r[0])}</b><div class="note">${esc(r[1])}</div></td></tr>`).join('')}</table></div>
+  </div>`;
+};
+
+/* ── catalogue ──────────────────────────────── */
+V.cat = el => {
+  let f = '', q = '';
+  el.innerHTML = `<p class="lede">Every capability of the complete platform, by layer.</p>
+   <div class="toolbar"><input type="text" id="cq" placeholder="Search capabilities…" style="width:260px"><select id="cf"><option value="">All layers</option>${ST.map(s => `<option>${s}</option>`).join('')}</select><span class="note" id="cc"></span></div>
+   <div class="card"><table><thead><tr><th>Layer</th><th>Capability</th><th>What it does</th></tr></thead><tbody id="cb"></tbody></table></div>`;
+  const draw = () => { const rows = D.CAPS.filter(c => (!f || c[0] === f) && (!q || c.join(' ').toLowerCase().includes(q))); $('#cc').textContent = `${rows.length} capabilities`;
+    let last = ''; $('#cb').innerHTML = rows.map(c => { const a = c[0] !== last ? stc(c[0]) : ''; last = c[0]; return `<tr><td>${a}</td><td><b>${esc(c[1])}</b></td><td>${esc(c[2])}</td></tr>`; }).join(''); };
+  $('#cq').oninput = e => { q = e.target.value.toLowerCase(); draw(); }; $('#cf').onchange = e => { f = e.target.value; draw(); }; draw();
+};
+
+/* ── zero trust ─────────────────────────────── */
+V.sec = el => {
+  el.innerHTML = `<p class="lede">Zero trust: every person, device and service proves who it is on every hop, gets only what it needs, and leaves an immutable trail.</p>
+   <div class="grid" style="grid-template-columns:1.2fr 1fr">
+    <div class="card"><h3>Controls</h3><table>${D.SECURITY.map(r => `<tr><td style="width:190px"><b>${esc(r[0])}</b></td><td>${esc(r[1])}</td></tr>`).join('')}</table></div>
+    <div class="card" style="align-self:start"><h3>Identity on each link</h3><table>${D.TRUST.map(t => `<tr><td>${esc(N[t[0]].n)} → ${esc(N[t[1]].n)}</td><td>🔒 ${esc(t[2])}</td></tr>`).join('')}</table>
+       <div style="margin-top:10px"><button class="btn" id="toLens">Show on the map →</button></div></div>
+   </div>`;
+  $('#toLens').onclick = () => { S.lens = true; go('map'); };
+};
+
+/* ── readiness ──────────────────────────────── */
+V.ops = el => {
+  const tbl = (rows, h) => `<table><tr>${h.map(x => `<th>${x}</th>`).join('')}</tr>${rows.map(r => `<tr><td style="width:34%"><b>${esc(r[0])}</b></td><td>${esc(r[1])}</td></tr>`).join('')}</table>`;
+  el.innerHTML = `<p class="lede">How the platform is run, deployed and kept trustworthy.</p>
+   <div class="grid" style="grid-template-columns:repeat(2,minmax(0,1fr))">
+    <div class="card"><h3>Deployment models</h3>${tbl(D.DEPLOY, ['Model', 'How it works'])}</div>
+    <div class="card"><h3>Data retention policy</h3>${tbl(D.POLICY, ['Data', 'Policy'])}<div class="note" style="margin-top:6px">Periods are set per DSO and regulation.</div></div>
+    <div class="card"><h3>Engineering practice</h3>${tbl(D.ENGINEERING, ['Area', 'Practice'])}</div>
+    <div class="card"><h3>Standards</h3><table><tr><td><b>CIM</b></td><td>IEC 61968 / 61970 / 61968-100 messaging, CGMES and CDPSM profiles</td></tr><tr><td><b>Power quality</b></td><td>EN 50160 · ESQCR · EREC G5</td></tr><tr><td><b>Security</b></td><td>IEC 62443 · ETSI EN 303 645 · ISO 27001 · NIS / CAF</td></tr><tr><td><b>Privacy</b></td><td>GDPR</td></tr></table></div>
+   </div>`;
+};
+
+/* ── Alerting: contacts, teams, silences, flood control + storm simulator ── */
+V.alert = el => {
+  const SITES = { North: ['Northfield', 'Riverside', 'Westhaven', 'Hillcrest', 'Eastbrook'], South: ['Harbour View', 'Meadowbank', 'Parkside', 'Southgate', 'Central Square'] };
+  const regionOf = site => SITES.North.includes(site) ? 'North' : 'South';
+  const SEVS = ['Critical', 'Major', 'Minor'];
+  const fmt = m => String(Math.floor(m / 60)).padStart(2, '0') + ':' + String(m % 60).padStart(2, '0');
+  if (!S.al) S.al = {
+    teams: [
+      { id: 'cr', n: 'Control Room', hours: '24/7', from: 0, to: 1440, region: 'All', rules: { Critical: 'now', Major: 'now', Minor: 'off' }, ch: { Critical: ['SMS', 'Email'], Major: ['Email'], Minor: ['Email'] },
+        contacts: [{ n: 'A. Byrne', sms: true, email: true }, { n: 'C. Walsh', sms: true, email: true }, { n: 'R. Patel', sms: false, email: true }] },
+      { id: 'fn', n: 'LV Field · North', hours: '07:00–19:00 + on-call', from: 420, to: 1140, oncall: 'S. Murphy', region: 'North', rules: { Critical: 'now', Major: 'now', Minor: 'off' }, ch: { Critical: ['SMS'], Major: ['SMS'], Minor: ['Email'] },
+        contacts: [{ n: 'S. Murphy', sms: true, email: true }, { n: 'D. Kelly', sms: true, email: false }, { n: 'J. Hughes', sms: true, email: true }, { n: 'M. Okafor', sms: true, email: false }] },
+      { id: 'fs', n: 'LV Field · South', hours: '07:00–19:00 + on-call', from: 420, to: 1140, oncall: 'L. Grant', region: 'South', rules: { Critical: 'now', Major: 'now', Minor: 'off' }, ch: { Critical: ['SMS'], Major: ['SMS'], Minor: ['Email'] },
+        contacts: [{ n: 'L. Grant', sms: true, email: true }, { n: 'P. Shah', sms: true, email: false }, { n: 'E. Reid', sms: true, email: true }] },
+      { id: 'am', n: 'Asset Management', hours: '08:00–17:00', from: 480, to: 1020, region: 'All', rules: { Critical: 'off', Major: 'now', Minor: 'digest' }, ch: { Critical: ['Email'], Major: ['Email'], Minor: ['Email'] },
+        contacts: [{ n: 'K. Brennan', sms: false, email: true }, { n: 'T. Clarke', sms: false, email: true }] },
+      { id: 'np', n: 'Network Planning', hours: 'Daily digest 07:00', from: 480, to: 1020, region: 'All', rules: { Critical: 'digest', Major: 'digest', Minor: 'digest' }, ch: { Critical: ['Email'], Major: ['Email'], Minor: ['Email'] },
+        contacts: [{ n: 'N. Fraser', sms: false, email: true }, { n: 'H. Chen', sms: false, email: true }] },
+    ],
+    silences: [
+      { on: true, kind: 'Planned outage (from outage feed)', scope: 'Meadowbank', from: 900, to: 1020, max: 'Critical', note: 'Expected loss of mains during planned work; device kept alive, snapshot on return' },
+      { on: true, kind: 'Storm mode · North', scope: 'North', from: 840, to: 1200, max: 'Minor', note: 'Minor alarms go to the digest while the storm is on' },
+      { on: false, kind: 'Device under maintenance', scope: 'Eastbrook', from: 780, to: 1080, max: 'Major', note: 'Manual silence by A. Byrne, reason: modem swap' },
+    ],
+    fc: { dedupe: true, dedupeMin: 15, group: true, groupMin: 60, rate: true, rateN: 4, quiet: true, escalate: true, escMin: 10 },
+    team: 'cr', sel: null,
+  };
+  const C = S.al;
+
+  /* deterministic storm: wind storm on the North 14:00–20:00, background all day */
+  const rnd = (() => { let x = 20261110; return () => (x = (x * 1103515245 + 12345) % 2147483648) / 2147483648; })();
+  const EV = [];
+  const add = (t, site, dev, code, sev, inc, cust) => EV.push({ t: Math.round(t), site, region: regionOf(site), dev, code, sev, inc, cust });
+  let incN = 400;
+  // background minor events 06:00–22:00
+  for (let t = 360; t < 1320; t += 9 + rnd() * 14) { const r = rnd() < .5 ? 'North' : 'South', s = SITES[r][Math.floor(rnd() * 5)]; add(t, s, `${s.slice(0, 3).toUpperCase()}-${10 + Math.floor(rnd() * 8)}`, rnd() < .6 ? 'Undervoltage blip' : 'Comms loss', 'Minor', null, 0); }
+  // storm faults on the North
+  const stormFaults = [[842, 'Northfield', 'F03', 214], [868, 'Riverside', 'F01', 156], [905, 'Westhaven', 'F05', 98], [951, 'Northfield', 'F06', 187], [1003, 'Hillcrest', 'F02', 260], [1047, 'Riverside', 'F04', 132], [1092, 'Westhaven', 'F02', 75], [1131, 'Eastbrook', 'F01', 120], [1166, 'Northfield', 'F03', 214]];
+  stormFaults.forEach(([t, s, f, cust]) => {
+    const inc = 'INC-' + (++incN), pre = s.slice(0, 3).toUpperCase();
+    add(t, s, `${pre}-EFI${f}a`, 'Fault passage (forward)', 'Major', inc, 0); add(t + .2, s, `${pre}-EFI${f}b`, 'Fault passage (reverse)', 'Major', inc, 0);
+    const n = 3 + Math.floor(rnd() * 5);
+    for (let k = 0; k < n; k++) { const d = `${pre}-${f}-${k + 1}`; add(t + .5 + k * .2, s, d, 'Loss of mains', 'Critical', inc, Math.round(cust / n));
+      for (let a = 1; a <= 2 + Math.floor(rnd() * 3); a++) { add(t + a * (1 + rnd() * 2), s, d, 'Mains returned', 'Minor', inc, 0); add(t + a * (1 + rnd() * 2) + .5, s, d, 'Loss of mains', 'Critical', inc, Math.round(cust / n)); } // auto-reclose flapping
+      if (rnd() < .5) add(t + 40 + rnd() * 30, s, d, 'Mains returned', 'Minor', inc, 0); }
+    for (let k = 0; k < 6; k++) add(t + 2 + rnd() * 25, s, `${pre}-${10 + k}`, 'Undervoltage', 'Minor', inc, 0);
+  });
+  // planned outage at Meadowbank 15:00–17:00 (expected loss of mains)
+  ['MEA-F02-1', 'MEA-F02-2', 'MEA-F02-3'].forEach((d, k) => { add(902 + k, 'Meadowbank', d, 'Loss of mains', 'Critical', 'INC-PLN', 90); add(1012 + k, 'Meadowbank', d, 'Mains returned', 'Minor', 'INC-PLN', 0); });
+  // a real fault in the South, mid-evening
+  const parInc = 'INC-' + (++incN + 50);
+  ['PAR-F01-1', 'PAR-F01-2', 'PAR-F01-3', 'PAR-F01-4'].forEach((d, k) => add(1194 + k * .3, 'Parkside', d, 'Loss of mains', 'Critical', parInc, 54));
+  add(1194, 'Parkside', 'PAR-EFIF01', 'Fault passage (forward)', 'Major', parInc, 0);
+  EV.sort((a, b) => a.t - b.t);
+
+  const onDuty = (tm, t) => tm.from === 0 || (t >= tm.from && t < tm.to) || !!tm.oncall;
+  const dutyPeople = (tm, t) => (tm.from === 0 || (t >= tm.from && t < tm.to)) ? tm.contacts : tm.contacts.filter(c => c.n === tm.oncall);
+  const deliver = (people, ch, all) => { let sms = 0, email = 0; people.forEach(c => { if (all) { sms++; email++; return; } const want = ch.filter(x => (x === 'SMS' && c.sms) || (x === 'Email' && c.email)); if (!want.length) email++; else want.forEach(x => x === 'SMS' ? sms++ : email++); }); return { sms, email }; };
+  const silencedBy = e => C.silences.find(s => s.on && e.t >= s.from && e.t < s.to && (s.scope === e.site || s.scope === e.region || s.scope === e.dev) && SEVS.indexOf(e.sev) >= SEVS.indexOf(s.max));
+
+  function simulate(useControls) {
+    const out = Object.fromEntries(C.teams.map(t => [t.id, []]));
+    const lastSeen = {}, incSent = {}, incSev = {}, bucket = {}, pendingSummary = {};
+    let suppressed = { silence: 0, dedupe: 0, group: 0, rate: 0, digest: 0 }, critMissed = 0;
+    const critIncs = new Set(), critCovered = new Set();
+    EV.forEach(e => {
+      if (e.sev === 'Critical' && e.inc && e.inc !== 'INC-PLN') critIncs.add(e.inc);
+      if (useControls) {
+        const sil = silencedBy(e); if (sil) { suppressed.silence++; return; }
+        const k = e.dev + '|' + e.code; if (C.fc.dedupe && lastSeen[k] != null && e.t - lastSeen[k] < C.fc.dedupeMin) { suppressed.dedupe++; lastSeen[k] = e.t; return; } lastSeen[k] = e.t;
+      }
+      C.teams.forEach(tm => {
+        if (tm.region !== 'All' && tm.region !== e.region) return;
+        let mode = tm.rules[e.sev]; if (mode === 'off') return;
+        if (!useControls) mode = 'now';
+        if (mode === 'digest') { suppressed.digest++; out[tm.id].push({ t: e.t, kind: 'digest', e }); return; }
+        if (useControls && C.fc.quiet && e.sev === 'Minor' && (e.t < 420 || e.t >= 1320)) { suppressed.digest++; out[tm.id].push({ t: e.t, kind: 'digest', e }); return; }
+        const people = dutyPeople(tm, e.t); if (!people.length) return;
+        if (useControls && C.fc.group && e.inc) {
+          const ik = tm.id + e.inc, prev = incSent[ik];
+          if (prev != null && e.t - prev < C.fc.groupMin) {
+            const worse = SEVS.indexOf(e.sev) < SEVS.indexOf(incSev[ik]);
+            if (!worse) { suppressed.group++; const last = out[tm.id].filter(x => x.inc === e.inc && x.kind !== 'digest').pop(); if (last) { last.count = (last.count || 1) + 1; last.cust = (last.cust || 0) + e.cust; } return; }
+          }
+          incSent[ik] = e.t; incSev[ik] = e.sev;
+        }
+        if (useControls && C.fc.rate && e.sev !== 'Critical') {
+          const b = tm.id + Math.floor(e.t / 15); bucket[b] = (bucket[b] || 0) + 1;
+          if (bucket[b] > C.fc.rateN) { suppressed.rate++; pendingSummary[b] = (pendingSummary[b] || 0) + 1; return; }
+        }
+        const ch = useControls ? tm.ch[e.sev] : ['SMS', 'Email'], d = deliver(useControls ? people : tm.contacts, ch, !useControls);
+        out[tm.id].push({ t: e.t, kind: 'now', e, inc: e.inc, ch, people: people.length, sms: d.sms, email: d.email, msgs: d.sms + d.email, count: 1, cust: e.cust });
+        if (tm.id === 'cr' && e.sev === 'Critical' && e.inc) critCovered.add(e.inc);
+      });
+    });
+    if (useControls) Object.entries(pendingSummary).forEach(([b, n]) => { const id = b.replace(/\d+$/, ''), slot = +b.slice(id.length); const tm = C.teams.find(t => t.id === id);
+      const pp = dutyPeople(tm, slot * 15 + 15); out[id].push({ t: slot * 15 + 15, kind: 'summary', n, ch: ['Email'], people: pp.length, sms: 0, email: pp.length, msgs: pp.length }); });
+    Object.values(out).forEach(a => a.sort((x, y) => x.t - y.t));
+    critIncs.forEach(i => { if (!critCovered.has(i)) critMissed++; });
+    const msgs = Object.values(out).flat().filter(x => x.kind !== 'digest').reduce((s, x) => s + (x.msgs || 0), 0);
+    const all = Object.values(out).flat().filter(x => x.kind !== 'digest');
+    return { out, msgs, sms: all.reduce((s, x) => s + (x.sms || 0), 0), email: all.reduce((s, x) => s + (x.email || 0), 0), suppressed, critIncs: critIncs.size, critMissed };
+  }
+
+  function chart(base, ctl) {
+    const B = 40, t0 = 600, bw = 15, W = 860, H = 170, P = 30, n = (1320 - t0) / bw;
+    const cnt = (sim, i) => Object.values(sim.out).flat().filter(x => x.kind !== 'digest' && x.t >= t0 + i * bw && x.t < t0 + (i + 1) * bw).reduce((s, x) => s + (x.msgs || 0), 0);
+    const raw = i => EV.filter(e => e.t >= t0 + i * bw && e.t < t0 + (i + 1) * bw).length;
+    const A = [...Array(n)].map((_, i) => [raw(i), cnt(base, i), cnt(ctl, i)]), mx = Math.max(...A.map(a => Math.max(a[1], a[0]))) || 1;
+    const x = i => P + i * (W - P) / n, y = v => H - 18 - v / mx * (H - 30), bwpx = (W - P) / n;
+    let g = `<line x1="${P}" x2="${W}" y1="${H - 18}" y2="${H - 18}" stroke="var(--line2)"/>`;
+    for (let h = 10; h <= 22; h += 2) g += `<text x="${x((h * 60 - t0) / bw)}" y="${H - 4}" font-size="10" fill="var(--muted)">${h}:00</text>`;
+    g += `<rect x="${x((840 - t0) / bw)}" y="4" width="${x((1200 - t0) / bw) - x((840 - t0) / bw)}" height="${H - 22}" fill="var(--Clientsbg)" opacity=".5"/><text x="${x((840 - t0) / bw) + 4}" y="15" font-size="10" fill="var(--Clients)" font-weight="700">storm</text>`;
+    A.forEach((a, i) => { g += `<rect x="${x(i) + 1}" y="${y(a[1])}" width="${bwpx * .45}" height="${H - 18 - y(a[1])}" fill="var(--line2)"><title>${fmt(t0 + i * bw)} · without controls: ${a[1]} messages</title></rect>`;
+      g += `<rect x="${x(i) + 1 + bwpx * .45}" y="${y(a[2])}" width="${bwpx * .45}" height="${H - 18 - y(a[2])}" fill="var(--accent)"><title>${fmt(t0 + i * bw)} · with controls: ${a[2]} messages</title></rect>`; });
+    g += `<polyline fill="none" stroke="var(--Clients)" stroke-width="1.6" points="${A.map((a, i) => `${x(i) + bwpx / 2},${y(a[0])}`).join(' ')}"/>`;
+    return `<svg viewBox="0 0 ${W} ${H}" width="100%">${g}</svg><div class="legend"><span><i style="display:inline-block;width:10px;height:10px;background:var(--line2);margin-right:5px"></i>messages without controls</span><span><i style="display:inline-block;width:10px;height:10px;background:var(--accent);margin-right:5px"></i>messages with controls</span><span><i style="display:inline-block;width:14px;height:2px;background:var(--Clients);margin-right:5px;vertical-align:3px"></i>raw alarm events</span></div>`;
+  }
+
+  function render() {
+    const base = simulate(false), ctl = simulate(true), red = base.msgs ? Math.round((1 - ctl.msgs / base.msgs) * 100) : 0;
+    const tm = C.teams.find(t => t.id === C.team), inbox = ctl.out[tm.id];
+    const chip = (on, label) => `<span class="st L" style="color:${on ? 'var(--Manage)' : 'var(--muted)'};background:${on ? 'var(--Managebg)' : 'var(--panel2)'}">${label}</span>`;
+    el.innerHTML = `<p class="lede">Contacts and teams choose what they receive and whether by SMS or email. Time-based silences and flood controls stop an alarm storm turning into hundreds of messages, while every critical incident still reaches the control room. Change any setting and the storm below re-runs.</p>
+    <div class="grid" style="grid-template-columns:repeat(5,minmax(0,1fr));margin-bottom:14px">
+      <div class="card"><div class="note">Raw alarm events</div><div style="font-size:26px;font-weight:700">${EV.length}</div><div class="note">one storm day, simulated</div></div>
+      <div class="card"><div class="note">Messages without controls</div><div style="font-size:26px;font-weight:700;color:var(--muted)">${base.msgs.toLocaleString('en-GB')}</div><div class="note">every alarm to every contact by SMS and email (${base.sms.toLocaleString('en-GB')} SMS)</div></div>
+      <div class="card"><div class="note">Messages with controls</div><div style="font-size:26px;font-weight:700;color:var(--accent)">${ctl.msgs.toLocaleString('en-GB')}</div><div class="note">${ctl.sms.toLocaleString('en-GB')} SMS · ${ctl.email.toLocaleString('en-GB')} email · on-duty only</div></div>
+      <div class="card"><div class="note">Reduction</div><div style="font-size:26px;font-weight:700;color:var(--Manage)">${red}%</div><div class="note">less alarm fatigue</div></div>
+      <div class="card"><div class="note">Critical incidents reaching the control room</div><div style="font-size:26px;font-weight:700;color:${ctl.critMissed ? 'var(--Clients)' : 'var(--Manage)'}">${ctl.critIncs - ctl.critMissed}/${ctl.critIncs}</div><div class="note">${ctl.critMissed ? 'check rules: an incident was missed' : 'none missed; planned outage excluded'}</div></div>
+    </div>
+    <div class="card" style="margin-bottom:14px"><h3>Storm day: messages every 15 minutes</h3>${chart(base, ctl)}
+      <div class="note" style="margin-top:6px">Held back by: silences ${ctl.suppressed.silence} · duplicates ${ctl.suppressed.dedupe} · grouped into incidents ${ctl.suppressed.group} · rate-limited into summaries ${ctl.suppressed.rate} · sent to digests ${ctl.suppressed.digest}</div></div>
+    <div class="grid" style="grid-template-columns:1.15fr 1fr;align-items:start">
+     <div class="grid">
+      <div class="card"><h3>Teams and contacts</h3><table><tr><th>Team</th><th>Hours</th><th>Region</th>${SEVS.map(s => `<th>${s}</th>`).join('')}</tr>
+        ${C.teams.map(t => `<tr class="tmrow" data-t="${t.id}" style="cursor:pointer;${t.id === C.team ? 'background:var(--panel2)' : ''}"><td><b>${esc(t.n)}</b><div class="note">${t.contacts.length} contacts${t.oncall ? ' · on-call ' + esc(t.oncall) : ''}</div></td><td class="note">${esc(t.hours)}</td><td class="note">${t.region}</td>
+          ${SEVS.map(s => `<td><select data-r="${t.id}|${s}" style="padding:3px 4px;font-size:12px">${['now', 'digest', 'off'].map(m => `<option value="${m}" ${t.rules[s] === m ? 'selected' : ''}>${{ now: 'Immediate', digest: 'Digest', off: 'Off' }[m]}</option>`).join('')}</select>${t.rules[s] === 'now' ? `<select data-c="${t.id}|${s}" style="padding:3px 4px;font-size:12px;margin-top:3px">${[['SMS'], ['Email'], ['SMS', 'Email']].map(c => `<option value="${c.join('+')}" ${t.ch[s].join('+') === c.join('+') ? 'selected' : ''}>${c.join(' + ')}</option>`).join('')}</select>` : `<div class="note" style="font-size:10.5px">${t.rules[s] === 'digest' ? 'Email digest' : '—'}</div>`}</td>`).join('')}</tr>`).join('')}</table>
+        <div class="note" style="margin-top:6px">Click a team to see its contacts and inbox. Rosters decide who is on duty; out of hours only the on-call contact is alerted.</div></div>
+      <div class="card"><h3>${esc(tm.n)} · contacts</h3><table><tr><th>Contact</th><th>SMS</th><th>Email</th><th></th></tr>${tm.contacts.map((c, i) => `<tr><td><b>${esc(c.n)}</b>${tm.oncall === c.n ? ' <span class="note">on-call</span>' : ''}<div class="note">+353 8• ••• ••${10 + i} · ${esc(c.n.toLowerCase().replace(/[^a-z]/g, ''))}@dso.example</div></td><td><input type="checkbox" data-cs="${i}" ${c.sms ? 'checked' : ''}></td><td><input type="checkbox" data-ce="${i}" ${c.email ? 'checked' : ''}></td><td class="note">${c.sms && c.email ? 'both' : c.sms ? 'SMS only' : c.email ? 'email only' : 'none: falls back to email'}</td></tr>`).join('')}</table>
+        <div class="note" style="margin-top:6px">Each contact chooses SMS, email or both. If a rule asks for a channel the contact has turned off, they get it by their other channel, so nobody is silently dropped.</div></div>
+      <div class="card"><h3>Time-based silences</h3>${C.silences.map((s, i) => `<div class="hop done" style="cursor:default"><input type="checkbox" data-s="${i}" ${s.on ? 'checked' : ''} style="margin-top:4px"><div style="flex:1"><b>${esc(s.kind)}</b> · ${esc(s.scope)} · ${fmt(s.from)}–${fmt(s.to)} · up to <b>${s.max}</b><div class="note">${esc(s.note)}</div></div></div>`).join('')}
+        <div class="row" style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-top:8px"><span class="note">Add silence:</span><select id="nsScope">${[...SITES.North, ...SITES.South, 'North', 'South'].map(x => `<option>${x}</option>`).join('')}</select>
+          <select id="nsFrom">${[...Array(24)].map((_, h) => `<option value="${h * 60}" ${h === 14 ? 'selected' : ''}>${String(h).padStart(2, '0')}:00</option>`).join('')}</select>–<select id="nsTo">${[...Array(24)].map((_, h) => `<option value="${(h + 1) * 60}" ${h === 17 ? 'selected' : ''}>${String(h + 1).padStart(2, '0')}:00</option>`).join('')}</select>
+          <select id="nsMax"><option>Minor</option><option>Major</option></select><button class="btn" id="nsAdd">Add</button></div>
+        <div class="note" style="margin-top:6px">Silences expire on their own. Critical alarms can only be silenced by a planned outage that covers the same site and time; a manual silence never hides a loss of mains.</div></div>
+     </div>
+     <div class="grid">
+      <div class="card"><h3>Flood controls</h3>
+        <div class="hop done" style="cursor:default"><input type="checkbox" data-f="dedupe" ${C.fc.dedupe ? 'checked' : ''}><div style="flex:1"><b>De-duplicate</b>: same device and alarm within <input type="number" data-n="dedupeMin" value="${C.fc.dedupeMin}" min="1" max="120" style="width:52px"> min becomes one (auto-reclose flapping)</div></div>
+        <div class="hop done" style="cursor:default"><input type="checkbox" data-f="group" ${C.fc.group ? 'checked' : ''}><div style="flex:1"><b>Group into incidents</b>: one message per incident per team for <input type="number" data-n="groupMin" value="${C.fc.groupMin}" min="5" max="240" style="width:52px"> min; a new message only if it gets worse</div></div>
+        <div class="hop done" style="cursor:default"><input type="checkbox" data-f="rate" ${C.fc.rate ? 'checked' : ''}><div style="flex:1"><b>Rate limit</b>: at most <input type="number" data-n="rateN" value="${C.fc.rateN}" min="1" max="50" style="width:52px"> non-critical messages per team per 15 min, then one summary</div></div>
+        <div class="hop done" style="cursor:default"><input type="checkbox" data-f="quiet" ${C.fc.quiet ? 'checked' : ''}><div style="flex:1"><b>Quiet hours</b>: minor alarms 22:00–07:00 go to the morning digest</div></div>
+        <div class="hop done" style="cursor:default"><input type="checkbox" data-f="escalate" ${C.fc.escalate ? 'checked' : ''}><div style="flex:1"><b>Escalate</b>: critical not acknowledged within <input type="number" data-n="escMin" value="${C.fc.escMin}" min="2" max="60" style="width:52px"> min goes to the next tier</div></div>
+        <div class="note" style="margin-top:6px">Every suppressed alarm is still stored on the asset record and in the incident; controls change who is interrupted, not what is recorded.</div></div>
+      <div class="card"><h3>${esc(tm.n)} inbox <span class="sp"></span><span class="note">${inbox.filter(x => x.kind !== 'digest').length} notifications · ${inbox.filter(x => x.kind === 'digest').length} to digest</span></h3>
+        <div style="max-height:330px;overflow:auto">${inbox.filter(x => x.kind !== 'digest').slice(0, 60).map(x => x.kind === 'summary'
+          ? `<div class="hop done" style="cursor:default"><span class="n" style="background:var(--panel2);color:var(--text2)">Σ</span><div class="d" style="display:block"><b>${fmt(x.t)} · Summary</b>: ${x.n} more non-critical alarms in the last 15 min <span class="note">· one email</span></div></div>`
+          : `<div class="hop done" style="cursor:default"><span class="n" style="background:var(--${x.e.sev === 'Critical' ? 'Clients' : x.e.sev === 'Major' ? 'Reason' : 'Manage'}bg);color:var(--${x.e.sev === 'Critical' ? 'Clients' : x.e.sev === 'Major' ? 'Reason' : 'Manage'})">${x.e.sev[0]}</span><div class="d" style="display:block"><b>${fmt(x.t)} · ${esc(x.e.code)}</b> · ${esc(x.e.site)}${x.inc ? ` · ${x.inc}` : ''}${x.count > 1 ? ` · <b>${x.count} alarms</b>` : ''}${x.cust ? ` · ${x.cust} customers` : ''}<div class="note">${x.sms ? x.sms + ' SMS' : ''}${x.sms && x.email ? ' · ' : ''}${x.email ? x.email + ' email' : ''} · ${x.people} on duty${C.fc.escalate && x.e.sev === 'Critical' ? ` · escalates if not acknowledged in ${C.fc.escMin} min` : ''}</div></div></div>`).join('') || '<div class="note">Nothing sent to this team.</div>'}</div></div>
+     </div></div>`;
+    $$('select[data-r]', el).forEach(s => s.onchange = () => { const [t, sev] = s.dataset.r.split('|'), tm2 = C.teams.find(x => x.id === t); tm2.rules[sev] = s.value; if (s.value !== 'off' && !tm2.ch[sev].length) tm2.ch[sev] = s.value === 'digest' ? ['Email'] : ['SMS']; render(); });
+    $$('select[data-c]', el).forEach(s => s.onchange = () => { const [t, sev] = s.dataset.c.split('|'); C.teams.find(x => x.id === t).ch[sev] = s.value.split('+'); render(); });
+    $$('input[data-cs]', el).forEach(c => c.onchange = () => { tm.contacts[+c.dataset.cs].sms = c.checked; render(); });
+    $$('input[data-ce]', el).forEach(c => c.onchange = () => { tm.contacts[+c.dataset.ce].email = c.checked; render(); });
+    $$('.tmrow', el).forEach(r => r.onclick = e => { if (e.target.tagName === 'SELECT' || e.target.tagName === 'OPTION') return; C.team = r.dataset.t; render(); });
+    $$('input[data-s]', el).forEach(c => c.onchange = () => { C.silences[+c.dataset.s].on = c.checked; render(); });
+    $$('input[data-f]', el).forEach(c => c.onchange = () => { C.fc[c.dataset.f] = c.checked; render(); });
+    $$('input[data-n]', el).forEach(c => c.onchange = () => { C.fc[c.dataset.n] = Math.max(1, +c.value || 1); render(); });
+    $('#nsAdd').onclick = () => { const from = +$('#nsFrom').value, to = +$('#nsTo').value; if (to <= from) return; C.silences.push({ on: true, kind: 'Manual silence', scope: $('#nsScope').value, from, to, max: $('#nsMax').value, note: 'Added in this demo; expires automatically' }); render(); };
+  }
+  render();
+};
+
+/* ── Reports & monitoring: scheduled reports across the IoT estate and the DSO network ── */
+V.rep = el => {
+  const TEAMS = ['Control Room', 'LV Field · North', 'LV Field · South', 'Asset Management', 'Network Planning', 'Platform Operations', 'Regulation'];
+  if (!S.rp) S.rp = {
+    sel: 'net-health',
+    reports: [
+      { id: 'fleet', side: 'IoT estate', n: 'Device fleet health', what: 'Online/offline, heartbeat age, loss-of-mains events, signal strength, battery/hold-up and pole tilt by device type (ground, pole, fault indicator, single-feeder, certified partner).', sched: 'Daily 06:30', fmt: 'PDF + Email', to: ['Platform Operations', 'Asset Management'], scope: 'All regions', on: true },
+      { id: 'fw', side: 'IoT estate', n: 'Firmware & certificates', what: 'Versions by ring, rollouts in progress, rollbacks, certificates expiring in 30/60/90 days, revoked devices.', sched: 'Weekly Mon 07:00', fmt: 'PDF', to: ['Platform Operations'], scope: 'All regions', on: true },
+      { id: 'comms', side: 'IoT estate', n: 'Connectivity & SIM usage', what: 'Connection stability, comms losses with no last gasp, SIM data use against allowance, sites at risk of running out.', sched: 'Weekly Mon 07:00', fmt: 'Excel', to: ['Platform Operations'], scope: 'All regions', on: true },
+      { id: 'pipe', side: 'IoT estate', n: 'Platform & pipeline health', what: 'IoT Hub and Event Hubs throughput, ingestion lag, queue depth, dead-letters, adapter run success, API availability against SLOs.', sched: 'Daily 06:00', fmt: 'Email', to: ['Platform Operations'], scope: 'Platform', on: true },
+      { id: 'complete', side: 'IoT estate', n: 'Data completeness', what: 'Expected vs received readings per device and per external source (head-ends, open data, historians, files); gaps and late data.', sched: 'Daily 06:30', fmt: 'Excel', to: ['Platform Operations', 'Network Planning'], scope: 'All sources', on: true },
+      { id: 'net-health', side: 'DSO network', n: 'Network health brief', what: 'Loading pressure, sites near rating, phase imbalance, power-quality exceptions and open incidents, with the evidence behind each.', sched: 'Daily 07:00', fmt: 'PDF + Email', to: ['Control Room', 'LV Field · North', 'LV Field · South'], scope: 'By region', on: true },
+      { id: 'pq', side: 'DSO network', n: 'Statutory power quality', what: 'Voltage against ESQCR limits, harmonics and imbalance against planning levels, per site with measurement coverage.', sched: 'Monthly 1st 08:00', fmt: 'PDF', to: ['Regulation', 'Asset Management'], scope: 'All regions', on: true },
+      { id: 'load', side: 'DSO network', n: 'Loading & headroom', what: 'Monthly peak per transformer, headroom measured or estimated, trend, flexible-limit candidates and reinforcement evidence.', sched: 'Monthly 1st 08:00', fmt: 'Excel', to: ['Network Planning'], scope: 'All regions', on: true },
+      { id: 'faults', side: 'DSO network', n: 'Faults & outage performance', what: 'Incidents, customers affected, minutes lost, time to restore against the 12-hour standard, fault location from indicators.', sched: 'Weekly Mon 08:00', fmt: 'PDF', to: ['Control Room', 'Regulation'], scope: 'All regions', on: true },
+      { id: 'alarms', side: 'DSO network', n: 'Alarm & notification activity', what: 'Alarms raised, grouped, silenced and de-duplicated; SMS and email sent per team; acknowledgement times; escalations.', sched: 'Weekly Mon 08:00', fmt: 'Excel', to: ['Control Room', 'Platform Operations'], scope: 'All teams', on: true },
+    ],
+  };
+  const P = S.rp;
+  const MON = [
+    ['IoT estate', 'Device heartbeat', 'No message for 3 × expected interval', 'Minor → Platform Operations'],
+    ['IoT estate', 'Loss of mains (last gasp)', 'Any device', 'Critical → Control Room, field team'],
+    ['IoT estate', 'Comms loss without last gasp', '> 30 min', 'Minor → Platform Operations'],
+    ['IoT estate', 'Certificate expiry', '< 30 days, renewal failed', 'Major → Platform Operations'],
+    ['IoT estate', 'Firmware rollout health', 'Health gate failed', 'Major → Platform Operations'],
+    ['IoT estate', 'SIM data allowance', '> 85% used', 'Minor → Platform Operations'],
+    ['IoT estate', 'Ingestion lag / dead-letters', 'Lag > 10 min or any dead-letter', 'Major → Platform Operations'],
+    ['IoT estate', 'External source freshness', 'Source late beyond its schedule', 'Minor → Platform Operations'],
+    ['DSO network', 'Transformer loading', '> 90% sustained 30 min', 'Major → field team'],
+    ['DSO network', 'Voltage', 'Outside 216.2–253 V', 'Major → field team; Minor → Asset Management'],
+    ['DSO network', 'Phase imbalance / harmonics', 'Above planning levels', 'Minor → Asset Management'],
+    ['DSO network', 'Fault passage', 'Any fault indicator', 'Major → Control Room'],
+    ['DSO network', 'Earth leakage trend', 'Rising for 3 days', 'Major → Asset Management'],
+  ];
+  const r = () => P.reports.find(x => x.id === P.sel);
+  function preview(x) {
+    const rows = {
+      'net-health': [['Sites near rating', '3', 'Northfield 93%, Riverside 91%, Westhaven 90%'], ['Visibility', '9 / 10', 'Eastbrook comms loss, no last gasp'], ['Open incidents', '1', 'Parkside: supply restored, cause not yet confirmed'], ['Voltage exceptions', '2', 'Midday overvoltage at two solar-heavy sites']],
+      fleet: [['Devices online', '1,184 / 1,212', '97.7%'], ['Loss-of-mains events', '41', 'all matched to incidents or planned work'], ['Pole tilt alerts', '3', 'after the storm, Westhaven and Hillcrest'], ['Certified partner devices', '86', '2 vendors, all reporting']],
+      fw: [['On current release', '1,103', 'ring 3 complete'], ['Rolling out', '64', 'ring 2, healthy'], ['Rolled back', '4', 'health gate held the release'], ['Certificates < 30 days', '0', 'renewal automatic']],
+      comms: [['Unstable links', '12', 'mostly GSM in rural areas'], ['Comms loss, no last gasp', '5', 'field check suggested'], ['SIMs > 85% used', '7', 'top-up or profile change']],
+      pipe: [['Messages processed', '18.4 M', 'peak 412 / s'], ['Ingestion lag p95', '42 s', 'within 10-minute objective'], ['Dead-letters', '0', ''], ['API availability', '99.97%', 'objective 99.9%']],
+      complete: [['Device readings received', '99.3%', ''], ['Head-end feeds on time', '4 / 4', ''], ['Historian windows', '23 / 24', 'one late window back-filled'], ['Open-data pulls', '100%', '']],
+      pq: [['Sites inside voltage limits', '96%', 'by measured coverage'], ['Harmonics above planning level', '4 sites', 'EV charging clusters'], ['Imbalance above 10%', '3 sites', 'rebalance at next visit']],
+      load: [['Transformers > 90% peak', '17', 'month to date'], ['Flexible-limit candidates', '9', 'evening peak only'], ['Reinforcement evidence packs', '3', 'measured, not estimated']],
+      faults: [['Incidents', '11', '9 during the storm'], ['Customers affected', '1,396', ''], ['Restored within 12 hours', '100%', 'longest 3 h 41 min'], ['Located by fault indicators', '8 / 9', 'between indicator pairs']],
+      alarms: [['Alarm events', '429', 'storm day'], ['Messages sent', '87 SMS · 67 email', 'down from 4,180 without controls'], ['Median acknowledgement', '3 min', 'critical'], ['Escalations', '2', 'both acknowledged by tier 2']],
+    }[x.id] || [];
+    return `<div style="border:1px solid var(--line2);border-radius:12px;overflow:hidden;background:#fff;color:#14161a">
+      <div style="background:#1d1e22;color:#fff;padding:12px 16px;display:flex;align-items:center;gap:10px"><svg width="20" height="20" viewBox="0 0 32 32"><g fill="#b6acf2"><rect x="6" y="6" width="4" height="13"/><rect x="14" y="10" width="4" height="13"/><rect x="22" y="14" width="4" height="13"/></g></svg><b>Phase3 · ${esc(x.n)}</b><span style="flex:1"></span><span style="font-size:12px;opacity:.8">${esc(x.scope)} · Tue 10 Nov 07:00</span></div>
+      <div style="padding:12px 16px"><div style="font-size:12px;color:#6b6a73;margin-bottom:6px">${esc(x.what)}</div><table style="font-size:13px">${rows.map(r => `<tr><td style="color:#4a4d57">${esc(r[0])}</td><td style="font-weight:700;font-size:15px">${esc(r[1])}</td><td style="color:#6b6a73">${esc(r[2])}</td></tr>`).join('')}</table>
+      <div style="font-size:11px;color:#80838d;margin-top:8px">Generated from the asset record and time-series store · every figure links back to its evidence · sample content</div></div></div>`;
+  }
+  function render() {
+    const x = r(), sides = ['IoT estate', 'DSO network'];
+    el.innerHTML = `<p class="lede">One platform watches the whole estate: the IoT side (devices, gateway, pipelines, data sources) and the DSO network itself. Continuous monitors raise alarms through the same teams, silences and flood controls; scheduled reports summarise both for the people who need them.</p>
+    <div class="grid" style="grid-template-columns:1.25fr 1fr;align-items:start">
+     <div class="card"><h3>Scheduled reports <span class="sp"></span><span class="note">${P.reports.filter(r => r.on).length} active</span></h3>
+      ${sides.map(sd => `<div class="note" style="margin:10px 0 4px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:${sd === 'IoT estate' ? 'var(--Measure)' : 'var(--Manage)'}">${sd}</div>
+        <table style="table-layout:fixed"><colgroup><col style="width:26px"><col><col style="width:130px"><col style="width:96px"></colgroup>${P.reports.filter(r => r.side === sd).map(r => `<tr class="rprow" data-id="${r.id}" style="cursor:pointer;${r.id === P.sel ? 'background:var(--panel2)' : ''}"><td style="width:22px"><input type="checkbox" data-on="${r.id}" ${r.on ? 'checked' : ''}></td><td><b>${esc(r.n)}</b><div class="note">${esc(r.to.join(', '))}</div></td><td class="note" style="white-space:nowrap">${esc(r.sched)}</td><td class="note">${esc(r.fmt)}</td></tr>`).join('')}</table>`).join('')}</div>
+     <div class="grid">
+      <div class="card"><h3>Schedule: ${esc(x.n)}</h3>
+        <div class="kv" style="grid-template-columns:90px 1fr;align-items:center">
+          <div>Runs</div><div><select id="rSched">${['Daily 06:00', 'Daily 06:30', 'Daily 07:00', 'Weekly Mon 07:00', 'Weekly Mon 08:00', 'Monthly 1st 08:00', 'On demand'].map(o => `<option ${o === x.sched ? 'selected' : ''}>${o}</option>`).join('')}</select></div>
+          <div>Format</div><div><select id="rFmt">${['Email', 'PDF', 'Excel', 'PDF + Email'].map(o => `<option ${o === x.fmt ? 'selected' : ''}>${o}</option>`).join('')}</select></div>
+          <div>Scope</div><div><select id="rScope">${['All regions', 'By region', 'North', 'South', 'All sources', 'All teams', 'Platform'].map(o => `<option ${o === x.scope ? 'selected' : ''}>${o}</option>`).join('')}</select></div>
+          <div>Send to</div><div style="display:flex;flex-wrap:wrap;gap:4px 10px">${TEAMS.map(t => `<label class="note" style="color:var(--text2)"><input type="checkbox" data-to="${esc(t)}" ${x.to.includes(t) ? 'checked' : ''}> ${esc(t)}</label>`).join('')}</div>
+        </div>
+        <div class="row" style="display:flex;gap:8px;margin-top:10px"><button class="btn pri" id="rRun" style="white-space:nowrap">Run now</button><span class="note" id="rMsg" style="align-self:center">Each issued report is archived and its delivery recorded.</span></div></div>
+      <div class="card"><h3>Preview</h3>${preview(x)}</div>
+     </div></div>
+    <div class="card" style="margin-top:14px"><h3>Continuous monitoring <span class="sp"></span><span class="note">raises alarms through the alerting rules</span></h3>
+      <table><tr><th>Side</th><th>Monitor</th><th>Trigger</th><th>Severity → routed to</th></tr>${MON.map(m => `<tr><td><span class="st L" style="color:var(--${m[0] === 'IoT estate' ? 'Measure' : 'Manage'});background:var(--${m[0] === 'IoT estate' ? 'Measure' : 'Manage'}bg)">${m[0]}</span></td><td><b>${esc(m[1])}</b></td><td>${esc(m[2])}</td><td class="note" style="color:var(--text2)">${esc(m[3])}</td></tr>`).join('')}</table></div>`;
+    $$('.rprow', el).forEach(row => row.onclick = e => { if (e.target.tagName === 'INPUT') return; P.sel = row.dataset.id; render(); });
+    $$('input[data-on]', el).forEach(c => c.onchange = () => { P.reports.find(r => r.id === c.dataset.on).on = c.checked; render(); });
+    $('#rSched').onchange = e => { x.sched = e.target.value; render(); }; $('#rFmt').onchange = e => { x.fmt = e.target.value; render(); }; $('#rScope').onchange = e => { x.scope = e.target.value; render(); };
+    $$('input[data-to]', el).forEach(c => c.onchange = () => { x.to = c.checked ? [...x.to, c.dataset.to] : x.to.filter(t => t !== c.dataset.to); render(); });
+    $('#rRun').onclick = () => { $('#rMsg').innerHTML = `<b style="color:var(--Manage)">Queued.</b> ${esc(x.n)} issued as ${esc(x.fmt)} to ${x.to.length} team${x.to.length === 1 ? '' : 's'}, archived, delivery recorded (simulated).`; };
+  }
+  render();
+};
+
+/* ── tour ───────────────────────────────────── */
+const synth = window.speechSynthesis; let ti = -1, tPlaying = false, tTimer = null, voice = null, voices = [], voiceOn = true, token = null;
+try { voiceOn = localStorage.getItem('p3a.voice') !== 'off'; } catch (e) { }
+const SPOKEN = [[/Phase3/g, 'Phase Three'], [/\bSQL\b/g, 'sequel'], [/\bIoT\b/g, 'I o T'], [/\bSMS\b/g, 'S M S'], [/\bAPIs\b/g, 'A P Is'], [/\bSignalR\b/g, 'Signal R'], [/\bOTA\b/g, 'O T A']];
+const vs = v => (/(Serena|Daniel|Kate|Google UK English|Sonia|Ryan|Libby|George|Hazel)/.test(v.name) ? 60 : 0) + (/Natural|Neural|Online|Premium|Enhanced/.test(v.name) ? 30 : 0) + (/en-GB/i.test(v.lang) ? 25 : /en-IE/i.test(v.lang) ? 20 : 5);
+function pickV() { if (!synth) return; voices = synth.getVoices().filter(v => /^en/i.test(v.lang)).sort((a, b) => vs(b) - vs(a)); voice = voices[0] || null; $('#vSel').innerHTML = voices.slice(0, 12).map(v => `<option>${esc(v.name)}</option>`).join(''); $('#vSel').style.display = voices.length && voiceOn ? '' : 'none'; }
+if (synth) { pickV(); synth.onvoiceschanged = pickV; }
+$('#vSel').onchange = e => { voice = voices.find(v => v.name === e.target.value) || voice; };
+function speak(t, done) {
+  if (!synth || !voiceOn) return false; synth.cancel(); const my = {}; token = my;
+  const parts = [], ss = (t.match(/[^.!?]+[.!?]+(\s|$)|[^.!?]+$/g) || [t]).map(x => x.trim()).filter(Boolean);
+  ss.forEach(x => { const l = parts[parts.length - 1]; if (l && (l + ' ' + x).length < 220) parts[parts.length - 1] = l + ' ' + x; else parts.push(x); });
+  parts.forEach((p, k) => { const u = new SpeechSynthesisUtterance(SPOKEN.reduce((x, [r, s]) => x.replace(r, s), p)); if (voice) { u.voice = voice; u.lang = voice.lang; } u.rate = .96;
+    if (k === parts.length - 1) u.onend = () => { if (token === my) done(); }; synth.speak(u); });
+  return true;
+}
+function tStep(i) {
+  if (i >= D.TOUR.length) return tStop(); if (i < 0) i = 0; ti = i; const s = D.TOUR[i], my = i;
+  clearTimeout(tTimer); if (synth) synth.cancel(); stopFlow(true);
+  if (S.tab !== s.tab) go(s.tab);
+  $('#tN').textContent = `Step ${i + 1} of ${D.TOUR.length}`; $('#tT').textContent = s.title; $('#tB').textContent = s.say;
+  $('#tour .pg span').style.width = ((i + 1) / D.TOUR.length * 100) + '%';
+  // a step moves on only when the narration has finished AND (for flows) the packet has reached the end
+  let spoken = !tPlaying, flowed = !s.flow;
+  const advance = () => { if (spoken && flowed && tPlaying && ti === my) { clearTimeout(tTimer); tTimer = setTimeout(() => { if (ti === my && tPlaying) tStep(ti + 1); }, s.flow ? 2500 : 900); } };
+  if (s.tab === 'map') {
+    if (s.lens !== undefined || s.flow || s.node) setLens(!!s.lens);
+    if (s.flow) { $('#flowSel').value = s.flow; setFlow(s.flow); if (tPlaying) setTimeout(() => { if (ti === my && tPlaying) playFlow(() => { flowed = true; advance(); }); }, 500); }
+    else if (s.node) { resetMap(); showNode(s.node); }
+    else if (!s.lens) { $('#flowSel').value = ''; resetMap(); }
+  }
+  if (!tPlaying) return;
+  const words = s.say.split(/\s+/).length;
+  if (!speak(s.say, () => { spoken = true; advance(); })) setTimeout(() => { spoken = true; advance(); }, Math.max(8000, words * 420));
+  // safety net in case a speech engine never reports the end
+  const hops = s.flow ? (D.FLOWS.find(f => f.id === s.flow).hops.length) : 0;
+  tTimer = setTimeout(() => { if (ti === my && tPlaying) tStep(ti + 1); }, Math.max(words * 520 + 8000, hops * 3600 + 6000) + 15000);
+}
+function tStart() { $('#tour').style.display = 'block'; tPlaying = true; $('#tPl').textContent = '❚❚'; $('#tV').textContent = voiceOn ? '🔊' : '🔇'; tStep(0); }
+function tStop() { tPlaying = false; clearTimeout(tTimer); if (synth) synth.cancel(); $('#tour').style.display = 'none'; ti = -1; }
+$('#tourBtn').onclick = tStart; $('#tX').onclick = tStop; $('#tN2').onclick = () => tStep(ti + 1); $('#tP').onclick = () => tStep(ti - 1);
+$('#tPl').onclick = () => { tPlaying = !tPlaying; $('#tPl').textContent = tPlaying ? '❚❚' : '▶'; if (tPlaying) tStep(ti); else { clearTimeout(tTimer); if (synth) synth.cancel(); stopFlow(true); } };
+$('#tV').onclick = () => { voiceOn = !voiceOn; try { localStorage.setItem('p3a.voice', voiceOn ? 'on' : 'off'); } catch (e) { } $('#tV').textContent = voiceOn ? '🔊' : '🔇'; $('#vSel').style.display = voiceOn && voices.length ? '' : 'none'; if (!voiceOn && synth) synth.cancel(); };
+$('#themeBtn').onclick = () => { const t = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark'; document.documentElement.dataset.theme = t; try { localStorage.setItem('p3a.theme', t); } catch (e) { } go(S.tab); };
+document.addEventListener('keydown', e => { if ($('#tour').style.display === 'block') { if (e.key === 'ArrowRight') tStep(ti + 1); if (e.key === 'ArrowLeft') tStep(ti - 1); if (e.key === 'Escape') tStop(); } });
+
+tabs(); go('map');
+})();
+</script>
+</body>
+</html>
